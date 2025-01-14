@@ -1,8 +1,8 @@
 pipeline {
     agent any
     environment {
-        VAULT_ADDR = 'http://35.175.182.176:8200/' // Replace with your Vault server's address
-        VAULT_TOKEN = credentials('hvs.dV5UcfRvRMzdG7OXqUZUtJVm') // Replace with Jenkins Vault token credential ID
+        VAULT_ADDR = credentials('VAULT_ADDR') // Fetch Vault address from Jenkins credentials
+        VAULT_TOKEN = credentials('VAULT_TOKEN') // Fetch Vault token from Jenkins credentials
     }
     stages {
         stage('Fetch AWS Credentials from Vault') {
@@ -21,8 +21,10 @@ pipeline {
     }
     post {
         always {
-            // Clean up temporary files
-            sh 'rm -f aws_creds.json aws_credentials.json'
+            node {
+                // Clean up temporary files inside a valid node context
+                sh 'rm -f aws_creds.json aws_credentials.json'
+            }
         }
     }
 }
