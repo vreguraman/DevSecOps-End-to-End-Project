@@ -3,14 +3,7 @@ data "vault_generic_secret" "aws_credentials" {
   path = "aws/creds/dev-role" # Replace <your-role-name> with your Vault AWS role
 }
 
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "5.82.0"
-    }
-  }
-}
+# Configure the AWS provider
 
 provider "aws" {
   # Configuration options
