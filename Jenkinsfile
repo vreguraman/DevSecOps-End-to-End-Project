@@ -35,18 +35,12 @@ pipeline {
     post {
         always {
             echo "Pipeline completed."
-        }
-        cleanup {
-            stage('Cleanup') {
-                steps {
-                    script {
-                        dir('terraform') {
-                            sh '''
-                            rm -f aws_creds.json aws_credentials.json
-                            terraform destroy -auto-approve
-                            '''
-                        }
-                    }
+            script {
+                dir('terraform') {
+                    sh '''
+                    rm -f aws_creds.json aws_credentials.json
+                    terraform destroy -auto-approve
+                    '''
                 }
             }
         }
