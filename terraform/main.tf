@@ -3,6 +3,11 @@ data "vault_generic_secret" "aws_credentials" {
   path = "aws/creds/dev-role" # Replace <your-role-name> with your Vault AWS role
 }
 
+provider "vault" {
+  address = var.vault_address  # Vault server address, fetched from variables
+  token   = var.vault_token    # Vault token, fetched from variables
+}
+
 # Configure the AWS provider
 
 provider "aws" {
