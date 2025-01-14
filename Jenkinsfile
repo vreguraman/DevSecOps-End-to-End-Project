@@ -17,19 +17,36 @@ pipeline {
                 }
             }
         }
-    }
-    stages {
         stage('Terraform') {
             steps {
                 script {
                     dir('terraform') {
                         sh '''
                         terraform init
-                        terraform plan
+                        terraform validate
+                        terraform plan -out=tfplan
                         terraform apply -auto-approve
                         '''
                     }
-                
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo "Pipeline completed."
+        }
+        cleanup {
+            stage('Cleanup') {
+                steps {
+                    script {
+                        dir('terraform') {
+                            sh '''
+                            rm -f aws_creds.json aws_credentials.json
+                            terraform destroy -auto-approve
+                            '''
+                        }
+                    }
                 }
             }
         }
