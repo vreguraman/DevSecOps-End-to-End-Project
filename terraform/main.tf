@@ -9,8 +9,8 @@ provider "vault" {}
 # Configure the AWS provider
 provider "aws" {
   region      = "us-east-1"
-  access_key  = data.vault_generic_secret.aws_credentials.data.access_key
-  secret_key  = data.vault_generic_secret.aws_credentials.data.secret_key
+  access_key  = "data.vault_generic_secret.aws_credentials.data.access_key"
+  secret_key  = "data.vault_generic_secret.aws_credentials.data.secret_key"
   
 }
 
