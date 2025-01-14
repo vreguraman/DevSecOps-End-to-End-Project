@@ -3,12 +3,22 @@ data "vault_generic_secret" "aws_credentials" {
   path = "aws/creds/dev-role" # Replace <your-role-name> with your Vault AWS role
 }
 
-# AWS provider configuration
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "5.82.0"
+    }
+  }
+}
+
 provider "aws" {
+  # Configuration options
   region     = "us-east-1" # Update with your preferred region
   access_key = data.vault_generic_secret.aws_credentials.data.access_key
   secret_key = data.vault_generic_secret.aws_credentials.data.secret_key
 }
+  
 
 # Security group to allow SSH (22) and HTTP (80) traffic
 resource "aws_security_group" "tfsec_sg" {
