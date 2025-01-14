@@ -1,6 +1,6 @@
 # Fetch AWS credentials from Vault
 data "vault_generic_secret" "aws_credentials" {
-  path = "aws/creds/dev-role" # Replace <your-role-name> with your Vault AWS role
+  path = "aws/creds/dev-role" # Path to the Vault role
 }
 
 # Configure the Vault provider (relies on environment variables)
@@ -8,9 +8,10 @@ provider "vault" {}
 
 # Configure the AWS provider
 provider "aws" {
-  region     = "us-east-1" # Update with your preferred region
-  access_key = data.vault_generic_secret.aws_credentials.data.access_key
-  secret_key = data.vault_generic_secret.aws_credentials.data.secret_key
+  region      = "us-east-1"
+  access_key  = data.vault_generic_secret.aws_credentials.data.access_key
+  secret_key  = data.vault_generic_secret.aws_credentials.data.secret_key
+  token       = data.vault_generic_secret.aws_credentials.data.security_token
 }
 
   
