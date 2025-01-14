@@ -1,5 +1,13 @@
+# Fetch AWS credentials from Vault
+data "vault_generic_secret" "aws_credentials" {
+  path = "aws/creds/dev-role" # Replace <your-role-name> with your Vault AWS role
+}
+
+# AWS provider configuration
 provider "aws" {
-  region = "us-east-1"
+  region     = "us-east-1" # Update with your preferred region
+  access_key = data.vault_generic_secret.aws_credentials.data.access_key
+  secret_key = data.vault_generic_secret.aws_credentials.data.secret_key
 }
 
 # Security group to allow SSH (22) and HTTP (80) traffic
@@ -37,7 +45,7 @@ resource "aws_security_group" "tfsec_sg" {
 resource "aws_instance" "example" {
   ami           = "ami-05576a079321f21f8" # Amazon Linux 2 AMI
   instance_type = "t2.micro"
-  key_name      = "Devsecops"            # Use your keypair
+  key_name      = "Devsecops" # Use your keypair
 
   # Attach the security group to the instance
   vpc_security_group_ids = [aws_security_group.tfsec_sg.id]
