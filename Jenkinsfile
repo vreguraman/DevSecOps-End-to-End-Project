@@ -18,4 +18,21 @@ pipeline {
             }
         }
     }
+    stages {
+        stage('Terraform') {
+            steps {
+                script {
+                    dir('terraform') {
+                        sh '''
+                        terraform init
+                        terraform plan
+                        terraform apply -auto-approve
+                        '''
+                    }
+
+                
+                }
+            }
+        }
+    }
 }
