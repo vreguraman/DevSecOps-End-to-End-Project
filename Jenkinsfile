@@ -1,26 +1,28 @@
 pipeline {
     agent any
     environment {
-        VAULT_ADDR = 'http://<Vault_Server_IP>:8200'
-        VAULT_TOKEN = credentials('VAULT_TOKEN')
+        VAULT_ADDR = 'http://52.90.125.142:8200'
+        VAULT_TOKEN = credentials('VAULT_TOKEN') // Assuming the Vault token is stored in Jenkins credentials
     }
     stages {
         stage('Test Vault') {
             steps {
                 sh '''
-                vault read -format=json aws/creds/dev-role > aws_creds.json
-                jq '.data' aws_creds.json
+                export VAULT_ADDR=${VAULT_ADDR}
+                export VAULT_TOKEN=${VAULT_TOKEN}
+                vault read -format=json aws/creds/dev-role
                 '''
             }
         }
         stage('Terraform Apply') {
             steps {
-                dir('terraform') {
-                    sh '''
-                    terraform init
-                    terraform plan
-                    terraform apply -auto-approve
-                    '''
+                script {
+                    dir('terraform') {
+                        sh '''
+                        terraform init
+                        terraform apply -auto-approve
+                        '''
+                    }
                 }
             }
         }
