@@ -8,35 +8,10 @@ pipeline {
         stage('Test Vault') {
             steps {
                 sh '''
-                echo "Testing Vault Connection..."
                 export VAULT_ADDR=${VAULT_ADDR}
                 export VAULT_TOKEN=${VAULT_TOKEN}
                 vault read -format=json aws/creds/dev-role
                 '''
-            }
-        }
-        stage('Terraform Init') {
-            steps {
-                script {
-                    dir('terraform') {
-                        sh '''
-                        echo "Initializing Terraform..."
-                        terraform init
-                        '''
-                    }
-                }
-            }
-        }
-        stage('Terraform Plan') {
-            steps {
-                script {
-                    dir('terraform') {
-                        sh '''
-                        echo "Running Terraform Plan..."
-                        terraform plan -out=tfplan
-                        '''
-                    }
-                }
             }
         }
         stage('Terraform Apply') {
@@ -44,23 +19,12 @@ pipeline {
                 script {
                     dir('terraform') {
                         sh '''
-                        echo "Applying Terraform Configuration..."
-                        terraform apply -auto-approve tfplan
+                        terraform init
+                        terraform apply -auto-approve
                         '''
                     }
                 }
             }
-        }
-    }
-    post {
-        always {
-            echo "Pipeline completed."
-        }
-        success {
-            echo "Terraform applied successfully!"
-        }
-        failure {
-            echo "Pipeline failed. Check the logs for details."
         }
     }
 }
