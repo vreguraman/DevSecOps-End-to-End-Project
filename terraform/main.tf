@@ -7,10 +7,11 @@ data "vault_generic_secret" "aws_credentials" {
 }
 
 provider "aws" {
-  access_key = data.vault_generic_secret.aws_credentials.data["access_key"]
-  secret_key = data.vault_generic_secret.aws_credentials.data["secret_key"]
   region     = "us-east-1"
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
 }
+
 
 
 resource "aws_security_group" "example_sg" {
