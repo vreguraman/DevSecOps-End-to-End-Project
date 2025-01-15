@@ -40,11 +40,11 @@ resource "aws_security_group" "example_sg" {
   }
 
   tags = {
-    Name = "example-sg"
+    Name = "Sample-Ecommerce-Instance-SG"
   }
 }
 
-resource "aws_instance" "example_instance" {
+resource "aws_instance" "Sample-Ecommerce-Instance" {
   ami           = "ami-05576a079321f21f8" # Amazon Linux 2 AMI (Replace with your region-specific AMI)
   instance_type = "t2.micro"              # Free-tier eligible instance type
   key_name      = "Devsecops"             # Replace with your key pair name
@@ -52,6 +52,6 @@ resource "aws_instance" "example_instance" {
   vpc_security_group_ids = [aws_security_group.example_sg.id] # Attach the security group
 
   tags = {
-    Name = "example-instance"
+    Name = "Sample-Ecommerce-Instance"
   }
 }
