@@ -4,6 +4,7 @@ pipeline {
     environment {
         VAULT_ADDR = credentials('VAULT_ADDR') // Vault address fetched from Jenkins credentials
         VAULT_TOKEN = credentials('VAULT_TOKEN') // Vault token stored in Jenkins credentials
+        PATH = "/opt/sonar-scanner/bin:$PATH" // Ensure Sonar Scanner is in PATH
     }
 
     stages {
