@@ -1,5 +1,5 @@
 provider "vault" {
-  address = "http://52.90.125.142:8200/"
+  
 }
 
 data "vault_generic_secret" "aws_credentials" {
