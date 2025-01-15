@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        VAULT_ADDR = 'http://52.90.125.142:8200'
+        VAULT_ADDR = credentials('VAULT_ADDR') // Vault address fetched from Jenkins credentials
         VAULT_TOKEN = credentials('VAULT_TOKEN') // Vault token stored in Jenkins credentials
     }
     stages {
