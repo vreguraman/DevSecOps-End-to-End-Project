@@ -1,5 +1,4 @@
 provider "vault" {
-  
 }
 
 data "vault_generic_secret" "aws_credentials" {
@@ -12,31 +11,32 @@ provider "aws" {
   secret_key = var.aws_secret_key
 }
 
-
-
 resource "aws_security_group" "example_sg" {
   name        = "example-sg"
-  description = "Allow SSH and HTTP traffic"
+  description = "Allow restricted SSH and HTTP traffic"
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allow SSH from anywhere
+    cidr_blocks = ["192.168.0.0/24"] # Restrict SSH access to a specific range
+    description = "Allow SSH from private network"
   }
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allow HTTP from anywhere
+    cidr_blocks = ["192.168.0.0/24"] # Restrict HTTP access to a specific range
+    description = "Allow HTTP from private network"
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"] # Allow all outbound traffic
+    cidr_blocks = ["192.168.0.0/24"] # Restrict outbound traffic
+    description = "Allow outbound traffic to private network"
   }
 
   tags = {
@@ -45,11 +45,19 @@ resource "aws_security_group" "example_sg" {
 }
 
 resource "aws_instance" "Sample-Ecommerce-Instance" {
-  ami           = "ami-05576a079321f21f8" # Amazon Linux 2 AMI (Replace with your region-specific AMI)
+  ami           = "ami-05576a079321f21f8" # Replace with your region-specific AMI
   instance_type = "t2.micro"              # Free-tier eligible instance type
   key_name      = "Devsecops"             # Replace with your key pair name
 
   vpc_security_group_ids = [aws_security_group.example_sg.id] # Attach the security group
+
+  root_block_device {
+    encrypted = true # Encrypt the root block device
+  }
+
+  metadata_options {
+    http_tokens = "required" # Require metadata HTTP tokens
+  }
 
   tags = {
     Name = "Sample-Ecommerce-Instance"
