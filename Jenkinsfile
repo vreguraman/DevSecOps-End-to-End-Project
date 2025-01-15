@@ -29,7 +29,7 @@ pipeline {
                     dir('terraform') {
                         try {
                             sh '''
-                            tfscan .
+                            tfsec .
                             '''
                             if (fileExists('tfscan-results.txt')) {
                                 def results = readFile('tfscan-results.txt')
