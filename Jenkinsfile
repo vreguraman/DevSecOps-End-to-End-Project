@@ -85,14 +85,14 @@ pipeline {
                     export DOCKER_PASSWORD=$(vault kv get -field=password secret/docker)
 
                     echo "Building Docker image..."
-                    docker build -t $DOCKER_USERNAME/sample-ecommerce-app .
+                    docker build -t $DOCKER_USERNAME/sample-ecommerce-java-app .
 
                     echo "Logging in to Docker Hub..."
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
                     echo "Tagging and pushing Docker image..."
-                    docker tag sample-ecommerce-app $DOCKER_USERNAME/sample-ecommerce-app:latest
-                    docker push $DOCKER_USERNAME/sample-ecommerce-app:latest
+                    docker tag sample-ecommerce-app $DOCKER_USERNAME/sample-ecommerce-java-app:latest
+                    docker push $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     '''
                 }
             }
@@ -102,7 +102,7 @@ pipeline {
                 script {
                     sh '''
                     echo "Scanning Docker image with Trivy..."
-                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-app
+                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-java-app
                     '''
                 }
             }
