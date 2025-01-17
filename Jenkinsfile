@@ -102,7 +102,7 @@ pipeline {
                 script {
                     sh '''
                     echo "Scanning Docker image with Trivy..."
-                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-java-app
+                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     '''
                 }
             }
