@@ -85,7 +85,7 @@ pipeline {
                     export DOCKER_PASSWORD=$(vault kv get -field=password secret/docker)
 
                     echo "Building Docker image..."
-                    docker build -t $DOCKER_USERNAME/sample-ecommerce-java-app .
+                    docker build -t $DOCKER_USERNAME/sample-ecommerce-java-app:latest .
 
                     echo "Logging in to Docker Hub..."
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
