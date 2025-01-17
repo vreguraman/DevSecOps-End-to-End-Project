@@ -9,10 +9,10 @@ import org.springframework.core.io.ClassPathResource;
 @Controller
 public class MainController {
 
-    @GetMapping("/")
+    @GetMapping("/src/main/resources/static/index.html")
     @ResponseBody
     public String home() {
-        return "Welcome to the E-Commerce Application!";
+        return "index";
     }
 
     @GetMapping("/resource")
