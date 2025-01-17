@@ -49,7 +49,7 @@ pipeline {
                             -Dsonar.projectKey=Sample-Ecommerce-Project \
                             -Dsonar.sources=src \
                             -Dsonar.java.binaries=target/classes \
-                            -Dsonar.host.url=http://3.92.186.110:9000/ \
+                            -Dsonar.host.url=http://18.212.7.243:9000/ \
                             -Dsonar.login=sqa_c89317d4b88fd2b1fa3a4c3f09e57cb0e67226d0
                         '''
                     }
@@ -69,6 +69,61 @@ pipeline {
                             -var="aws_secret_key=$AWS_SECRET_KEY"
                         '''
                     }
+                }
+            }
+        }
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    sh '''
+                    echo "Fetching Docker credentials from Vault..."
+                    export VAULT_ADDR=${VAULT_ADDR}
+                    export VAULT_TOKEN=${VAULT_TOKEN}
+
+                    # Fetch credentials from Vault
+                    DOCKER_USERNAME=$(vault kv get -field=username secret/docker)
+                    DOCKER_PASSWORD=$(vault kv get -field=password secret/docker)
+
+                    echo "Building Docker image..."
+                    docker build -t sample-ecommerce-app .
+
+                    echo "Logging in to Docker Hub..."
+                    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+
+                    echo "Tagging and pushing Docker image..."
+                    docker tag sample-ecommerce-app $DOCKER_USERNAME/sample-ecommerce-app:latest
+                    docker push $DOCKER_USERNAME/sample-ecommerce-app:latest
+                    '''
+                }
+            }
+        }
+        stage('Scan Docker Image with Trivy') {
+            steps {
+                script {
+                    sh '''
+                    echo "Scanning Docker image with Trivy..."
+                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-app:latest
+                    '''
+                }
+            }
+        }
+        stage('Snyk Security Scan') {
+            steps {
+                script {
+                    sh '''
+                    echo "Fetching Snyk token from Vault..."
+                    export VAULT_ADDR=${VAULT_ADDR}
+                    export VAULT_TOKEN=${VAULT_TOKEN}
+
+                    # Fetch Snyk token from Vault
+                    SNYK_TOKEN=$(vault kv get -field=api_token snyk/token)
+
+                    echo "Authenticating Snyk CLI with fetched token..."
+                    snyk auth $SNYK_TOKEN
+
+                    echo "Running Snyk Security Scan..."
+                    snyk test
+                    '''
                 }
             }
         }
