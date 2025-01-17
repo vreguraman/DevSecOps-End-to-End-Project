@@ -1,9 +1,9 @@
 pipeline {
     agent any
     environment {
-        VAULT_ADDR = credentials('VAULT_ADDR') // Vault address fetched from Jenkins credentials
-        VAULT_TOKEN = credentials('VAULT_TOKEN') // Vault token stored in Jenkins credentials
-        PATH = "/opt/sonar-scanner/bin:$PATH" // Ensure Sonar Scanner is in PATH
+        VAULT_ADDR = credentials('VAULT_ADDR')
+        VAULT_TOKEN = credentials('VAULT_TOKEN')
+        PATH = "/opt/sonar-scanner/bin:$PATH"
     }
     stages {
         stage('Test Vault') {
@@ -81,11 +81,11 @@ pipeline {
                     export VAULT_TOKEN=${VAULT_TOKEN}
 
                     # Fetch credentials from Vault
-                    DOCKER_USERNAME=$(vault kv get -field=username secret/docker)
-                    DOCKER_PASSWORD=$(vault kv get -field=password secret/docker)
+                    export DOCKER_USERNAME=$(vault kv get -field=username secret/docker)
+                    export DOCKER_PASSWORD=$(vault kv get -field=password secret/docker)
 
                     echo "Building Docker image..."
-                    docker build -t sample-ecommerce-app .
+                    docker build -t $DOCKER_USERNAME/sample-ecommerce-app .
 
                     echo "Logging in to Docker Hub..."
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
@@ -116,7 +116,12 @@ pipeline {
                     export VAULT_TOKEN=${VAULT_TOKEN}
 
                     # Fetch Snyk token from Vault
-                    SNYK_TOKEN=$(vault kv get -field=api_token snyk/token)
+                    export SNYK_TOKEN=$(vault kv get -field=api_token snyk/token)
+
+                    if [ -z "$SNYK_TOKEN" ]; then
+                        echo "Error: Snyk token is empty. Exiting..."
+                        exit 1
+                    fi
 
                     echo "Authenticating Snyk CLI with fetched token..."
                     snyk auth $SNYK_TOKEN
