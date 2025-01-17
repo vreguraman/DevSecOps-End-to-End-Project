@@ -72,7 +72,7 @@ pipeline {
                 }
             }
         }
-        stage('Docker Build & Push') {
+        stage('Docker Build, scan & Push') {
             steps {
                 script {
                     sh '''
@@ -87,22 +87,15 @@ pipeline {
                     echo "Building Docker image..."
                     docker build -t $DOCKER_USERNAME/sample-ecommerce-java-app:latest .
 
+                    echo "Scanning Docker image with Trivy..."
+                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-java-app:latest
+
                     echo "Logging in to Docker Hub..."
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
                     echo "Tagging and pushing Docker image..."
                     docker tag sample-ecommerce-app $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     docker push $DOCKER_USERNAME/sample-ecommerce-java-app:latest
-                    '''
-                }
-            }
-        }
-        stage('Scan Docker Image with Trivy') {
-            steps {
-                script {
-                    sh '''
-                    echo "Scanning Docker image with Trivy..."
-                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     '''
                 }
             }
