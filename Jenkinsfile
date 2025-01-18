@@ -144,7 +144,7 @@ pipeline {
                     cat snyk-report.txt >> email-body.txt
 
                     echo "Emailing Reports..."
-                    mail -s "Security Scan Reports from CI/CD Pipeline" dev-team@example.com < email-body.txt
+                    mail -s "Security Scan Reports from CI/CD Pipeline" panny.gatla@gmail.com < email-body.txt
                     '''
                 }
             }
