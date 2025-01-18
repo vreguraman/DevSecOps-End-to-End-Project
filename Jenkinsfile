@@ -24,7 +24,7 @@ pipeline {
                     dir('terraform') {
                         sh '''
                         echo "Running TFScan..."
-                        tfsec .
+                        tfsec . | tee tfscan-report.txt
                         '''
                     }
                 }
@@ -45,12 +45,13 @@ pipeline {
                 script {
                     withSonarQubeEnv('SonarQube') {
                         sh '''
+                        echo "Running SonarQube Analysis..."
                         sonar-scanner \
                             -Dsonar.projectKey=Sample-Ecommerce-Project \
                             -Dsonar.sources=src \
                             -Dsonar.java.binaries=target/classes \
                             -Dsonar.host.url=http://18.212.7.243:9000/ \
-                            -Dsonar.login=sqa_c89317d4b88fd2b1fa3a4c3f09e57cb0e67226d0
+                            -Dsonar.login=sqa_c89317d4b88fd2b1fa3a4c3f09e57cb0e67226d0 | tee sonar-report.txt
                         '''
                     }
                 }
@@ -88,7 +89,7 @@ pipeline {
                     docker build -t $DOCKER_USERNAME/sample-ecommerce-java-app:latest .
 
                     echo "Scanning Docker image with Trivy..."
-                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-java-app:latest
+                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-java-app:latest | tee trivy-report.txt
 
                     echo "Logging in to Docker Hub..."
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
@@ -120,7 +121,30 @@ pipeline {
                     snyk auth $SNYK_TOKEN
 
                     echo "Running Snyk Security Scan..."
-                    snyk test || echo "Vulnerabilities found, continuing pipeline."
+                    snyk test | tee snyk-report.txt || echo "Vulnerabilities found, continuing pipeline."
+                    '''
+                }
+            }
+        }
+        stage('Send Reports to Developers') {
+            steps {
+                script {
+                    echo "Sending scan reports to developers..."
+                    sh '''
+                    echo "SonarQube Analysis Results:" > email-body.txt
+                    cat sonar-report.txt >> email-body.txt
+
+                    echo "\nTerraform Security Scan Results:" >> email-body.txt
+                    cat terraform/tfscan-report.txt >> email-body.txt
+
+                    echo "\nTrivy Docker Image Scan Results:" >> email-body.txt
+                    cat trivy-report.txt >> email-body.txt
+
+                    echo "\nSnyk Vulnerabilities Report:" >> email-body.txt
+                    cat snyk-report.txt >> email-body.txt
+
+                    echo "Emailing Reports..."
+                    mail -s "Security Scan Reports from CI/CD Pipeline" dev-team@example.com < email-body.txt
                     '''
                 }
             }
@@ -130,7 +154,7 @@ pipeline {
         always {
             script {
                 echo "Cleaning up temporary files..."
-                sh 'rm -f aws_creds.json access_key.txt secret_key.txt'
+                sh 'rm -f aws_creds.json access_key.txt secret_key.txt tfscan-report.txt trivy-report.txt snyk-report.txt sonar-report.txt email-body.txt'
             }
         }
         failure {
