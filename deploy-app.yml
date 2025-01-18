@@ -1,0 +1,21 @@
+# deploy-app.yml
+---
+- name: Deploy application on instances
+  hosts: servers
+  become: yes
+  tasks:
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+
+    - name: Pull Docker image
+      command: docker pull nuthan0530/sample-ecommerce-java-app:latest
+
+    - name: Run Docker container
+      command: docker run -d -p 8085:8085 nuthan0530/sample-ecommerce-java-app:latest

@@ -6,6 +6,7 @@ pipeline {
         PATH = "/opt/sonar-scanner/bin:$PATH"
     }
     stages {
+        // Stage 1: Test Vault Connection
         stage('Test Vault') {
             steps {
                 sh '''
@@ -18,6 +19,8 @@ pipeline {
                 '''
             }
         }
+        
+        // Stage 2: Terraform Security Scan (TFScan)
         stage('TFScan') {
             steps {
                 script {
@@ -30,6 +33,8 @@ pipeline {
                 }
             }
         }
+        
+        // Stage 3: Build WAR Package with Maven
         stage('Build WAR') {
             steps {
                 script {
@@ -40,6 +45,8 @@ pipeline {
                 }
             }
         }
+        
+        // Stage 4: SonarQube Code Analysis
         stage('SonarQube Analysis') {
             steps {
                 script {
@@ -56,6 +63,8 @@ pipeline {
                 }
             }
         }
+        
+        // Stage 5: Terraform Apply
         stage('Terraform Apply') {
             steps {
                 script {
@@ -72,7 +81,9 @@ pipeline {
                 }
             }
         }
-        stage('Docker Build, scan & Push') {
+        
+        // Stage 6: Docker Build, Scan, and Push
+        stage('Docker Build, Scan & Push') {
             steps {
                 script {
                     sh '''
@@ -80,7 +91,7 @@ pipeline {
                     export VAULT_ADDR=${VAULT_ADDR}
                     export VAULT_TOKEN=${VAULT_TOKEN}
 
-                    # Fetch credentials from Vault
+                    # Fetch Docker credentials from Vault
                     export DOCKER_USERNAME=$(vault kv get -field=username secret/docker)
                     export DOCKER_PASSWORD=$(vault kv get -field=password secret/docker)
 
@@ -94,12 +105,13 @@ pipeline {
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
                     echo "Tagging and pushing Docker image..."
-                    docker tag sample-ecommerce-app $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     docker push $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     '''
                 }
             }
         }
+        
+        // Stage 7: Snyk Security Scan
         stage('Snyk Security Scan') {
             steps {
                 script {
@@ -125,12 +137,45 @@ pipeline {
                 }
             }
         }
+        
+        // Stage 8: Generate Ansible Inventory
+        stage('Generate Ansible Inventory') {
+            steps {
+                script {
+                    def terraformOutputs = sh(returnStdout: true, script: '''
+                    terraform output -json
+                    ''').trim()
+                    def outputs = readJSON text: terraformOutputs
+                    def instanceIps = outputs.instance_ips.value
+
+                    def inventoryContent = "[servers]\n"
+                    for (ip in instanceIps) {
+                        inventoryContent += "${ip} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/ansible_key\n"
+                    }
+                    writeFile(file: 'ansible_inventory.txt', text: inventoryContent)
+                }
+            }
+        }
+        
+        // Stage 9: Deploy with Ansible
+        stage('Deploy with Ansible') {
+            steps {
+                script {
+                    sh '''
+                    echo "Deploying application with Ansible..."
+                    ansible-playbook -i ansible_inventory.txt deploy-app.yml
+                    '''
+                }
+            }
+        }
     }
+    
+    // Post Actions
     post {
         always {
             script {
                 echo "Cleaning up temporary files..."
-                sh 'rm -f aws_creds.json access_key.txt secret_key.txt'
+                sh 'rm -f aws_creds.json access_key.txt secret_key.txt terraform_outputs.json ansible_inventory.txt'
             }
         }
         failure {
