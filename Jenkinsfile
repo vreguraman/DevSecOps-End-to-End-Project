@@ -73,7 +73,7 @@ pipeline {
                 }
             }
         }
-        stage('Docker Build, scan & Push') {
+        stage('Docker Build, Scan & Push') {
             steps {
                 script {
                     sh '''
@@ -97,6 +97,30 @@ pipeline {
                     echo "Tagging and pushing Docker image..."
                     docker tag sample-ecommerce-app $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     docker push $DOCKER_USERNAME/sample-ecommerce-java-app:latest
+                    '''
+                }
+            }
+        }
+        stage('Nexus Integration') {
+            steps {
+                script {
+                    sh '''
+                    echo "Fetching Nexus credentials from Vault..."
+                    export VAULT_ADDR=${VAULT_ADDR}
+                    export VAULT_TOKEN=${VAULT_TOKEN}
+
+                    # Fetch credentials from Vault
+                    export NEXUS_USERNAME=$(vault kv get -field=username nexus/credentials)
+                    export NEXUS_PASSWORD=$(vault kv get -field=password nexus/credentials)
+                    export NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials)
+
+                    echo "Uploading artifact to Nexus..."
+                    ARTIFACT=target/project-0.0.1-SNAPSHOT.war
+                    curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD \
+                        --upload-file $ARTIFACT \
+                        $NEXUS_REPO_URL/repository/maven-releases/com/example/project/0.0.1-SNAPSHOT/project-0.0.1-SNAPSHOT.war
+
+                    echo "Artifact uploaded successfully to Nexus."
                     '''
                 }
             }
