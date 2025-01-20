@@ -33,10 +33,10 @@ pipeline {
         stage('Build WAR') {
             steps {
                 script {
-                        sh '''
-                        echo "Building project with Maven..."
-                        mvn clean install
-                        '''
+                    sh '''
+                    echo "Building project with Maven..."
+                    mvn clean install
+                    '''
                 }
             }
         }
@@ -94,8 +94,7 @@ pipeline {
                     echo "Logging in to Docker Hub..."
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
-                    echo "Tagging and pushing Docker image..."
-                    docker tag $DOCKER_USERNAME/sample-ecommerce-java-app:latest $DOCKER_USERNAME/sample-ecommerce-java-app:latest
+                    echo "Pushing Docker image to Docker Hub..."
                     docker push $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     '''
                 }
@@ -115,7 +114,7 @@ pipeline {
                     export NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials)
 
                     echo "Uploading artifact to Nexus..."
-                    ARTIFACT=project/target/project-0.0.1-SNAPSHOT.war
+                    ARTIFACT=target/project-0.0.1-SNAPSHOT.war
                     if [ ! -f "$ARTIFACT" ]; then
                         echo "Error: Artifact $ARTIFACT not found. Exiting..."
                         exit 1
