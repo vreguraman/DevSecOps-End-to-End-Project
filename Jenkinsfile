@@ -114,7 +114,7 @@ pipeline {
                     export NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials)
 
                     echo "Uploading artifact to Nexus..."
-                    ARTIFACT=target/project-0.0.1-SNAPSHOT.war
+                    ARTIFACT=/var/lib/jenkins/workspace/vault/target/project-0.0.1-SNAPSHOT.jar
                     if [ ! -f "$ARTIFACT" ]; then
                         echo "Error: Artifact $ARTIFACT not found. Exiting..."
                         exit 1
