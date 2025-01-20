@@ -33,6 +33,7 @@ pipeline {
         stage('Build WAR') {
             steps {
                 script {
+                    dir('project') { // Replace 'project' with the actual project directory name
                     sh '''
                     echo "Building project with Maven..."
                     mvn clean install
@@ -115,7 +116,7 @@ pipeline {
                     export NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials)
 
                     echo "Uploading artifact to Nexus..."
-                    ARTIFACT=target/project-0.0.1-SNAPSHOT.war
+                    ARTIFACT=project/target/project-0.0.1-SNAPSHOT.war
                     curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD \
                         --upload-file $ARTIFACT \
                         $NEXUS_REPO_URL/repository/e-commerce/
