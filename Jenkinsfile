@@ -33,12 +33,10 @@ pipeline {
         stage('Build WAR') {
             steps {
                 script {
-                    dir('project') { // Replace 'project' with the actual project directory name
                         sh '''
                         echo "Building project with Maven..."
                         mvn clean install
                         '''
-                    }
                 }
             }
         }
