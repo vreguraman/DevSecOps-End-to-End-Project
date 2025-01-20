@@ -34,10 +34,11 @@ pipeline {
             steps {
                 script {
                     dir('project') { // Replace 'project' with the actual project directory name
-                    sh '''
-                    echo "Building project with Maven..."
-                    mvn clean install
-                    '''
+                        sh '''
+                        echo "Building project with Maven..."
+                        mvn clean install
+                        '''
+                    }
                 }
             }
         }
@@ -96,7 +97,7 @@ pipeline {
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
                     echo "Tagging and pushing Docker image..."
-                    docker tag sample-ecommerce-app $DOCKER_USERNAME/sample-ecommerce-java-app:latest
+                    docker tag $DOCKER_USERNAME/sample-ecommerce-java-app:latest $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     docker push $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     '''
                 }
@@ -117,6 +118,11 @@ pipeline {
 
                     echo "Uploading artifact to Nexus..."
                     ARTIFACT=project/target/project-0.0.1-SNAPSHOT.war
+                    if [ ! -f "$ARTIFACT" ]; then
+                        echo "Error: Artifact $ARTIFACT not found. Exiting..."
+                        exit 1
+                    fi
+
                     curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD \
                         --upload-file $ARTIFACT \
                         $NEXUS_REPO_URL/repository/e-commerce/
