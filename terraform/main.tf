@@ -11,21 +11,17 @@ provider "aws" {
   secret_key = var.aws_secret_key
 }
 
-resource "aws_key_pair" "example" {
-  key_name   = "Ansible-SSH-Key"
-  public_key = file("~/.ssh/id_rsa.pub")
-}
 
 
 resource "aws_security_group" "example_sg" {
-  name        = "example-sg"
+  name        = "Sample-Ecommerce-Instance-SG"
   description = "Allow restricted SSH and HTTP traffic"
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["192.168.0.0/24"] # Restrict SSH access to a specific range
+    cidr_blocks = ["49.204.214.169/24"] # Restrict SSH access to a specific range
     description = "Allow SSH from private network"
   }
 
@@ -33,7 +29,7 @@ resource "aws_security_group" "example_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["192.168.0.0/24"] # Restrict HTTP access to a specific range
+    cidr_blocks = ["49.204.214.169/24"] # Restrict HTTP access to a specific range
     description = "Allow HTTP from private network"
   }
 
@@ -41,7 +37,7 @@ resource "aws_security_group" "example_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["192.168.0.0/24"] # Restrict outbound traffic
+    cidr_blocks = ["49.204.214.169/24"] # Restrict outbound traffic
     description = "Allow outbound traffic to private network"
   }
 
@@ -53,7 +49,7 @@ resource "aws_security_group" "example_sg" {
 resource "aws_instance" "Sample-Ecommerce-Instance" {
   ami           = "ami-05576a079321f21f8" # Replace with your region-specific AMI
   instance_type = "t2.micro"              # Free-tier eligible instance type
-  key_name   = "Ansible-SSH-Key"          # SSH key pair name
+  key_name   = "Devsecops"           # SSH key pair name
 
   vpc_security_group_ids = [aws_security_group.example_sg.id] # Attach the security group
 
