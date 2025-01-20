@@ -118,7 +118,7 @@ pipeline {
                     ARTIFACT=target/project-0.0.1-SNAPSHOT.war
                     curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD \
                         --upload-file $ARTIFACT \
-                        $NEXUS_REPO_URL/repository/maven-releases/com/example/project/0.0.1-SNAPSHOT/project-0.0.1-SNAPSHOT.war
+                        $NEXUS_REPO_URL/repository/e-commerce/
 
                     echo "Artifact uploaded successfully to Nexus."
                     '''
