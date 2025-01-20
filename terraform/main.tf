@@ -11,6 +11,12 @@ provider "aws" {
   secret_key = var.aws_secret_key
 }
 
+resource "aws_key_pair" "example" {
+  key_name   = "Ansible-SSH-Key"
+  public_key = file("~/.ssh/id_rsa.pub")
+}
+
+
 resource "aws_security_group" "example_sg" {
   name        = "example-sg"
   description = "Allow restricted SSH and HTTP traffic"
@@ -47,7 +53,7 @@ resource "aws_security_group" "example_sg" {
 resource "aws_instance" "Sample-Ecommerce-Instance" {
   ami           = "ami-05576a079321f21f8" # Replace with your region-specific AMI
   instance_type = "t2.micro"              # Free-tier eligible instance type
-  key_name      = "Devsecops"             # Replace with your key pair name
+  key_name   = "Ansible-SSH-Key"          # SSH key pair name
 
   vpc_security_group_ids = [aws_security_group.example_sg.id] # Attach the security group
 

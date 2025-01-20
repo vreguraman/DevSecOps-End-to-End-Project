@@ -50,7 +50,7 @@ pipeline {
                             -Dsonar.projectKey=Sample-Ecommerce-Project \
                             -Dsonar.sources=src \
                             -Dsonar.java.binaries=target/classes \
-                            -Dsonar.host.url=http://18.212.7.243:9000/ \
+                            -Dsonar.host.url=http://3.91.226.9:9000/ \
                             -Dsonar.login=sqa_c89317d4b88fd2b1fa3a4c3f09e57cb0e67226d0 | tee sonar-report.txt
                         '''
                     }
