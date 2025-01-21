@@ -33,7 +33,7 @@ This repository contains an end-to-end **DevSecOps pipeline** that automates the
 
 5. **Deployment and Monitoring**:
     - Docker containers are deployed to the EC2 instance.
-    - Prometheus collects metrics and Grafana visualizes them for observability.
+    - Prometheus collects metrics and Grafana visualizes them for observability....
 
 ---
 
