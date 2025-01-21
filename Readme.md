@@ -41,6 +41,7 @@ This repository contains an end-to-end **DevSecOps pipeline** that automates the
 ---
 
 ![](/Images/devsec.jpg)
+
 ---
 
 ## Tools and Technologies
