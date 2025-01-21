@@ -62,6 +62,7 @@ resource "aws_instance" "Sample-Ecommerce-Instance" {
   }
 
   tags = {
+    environment = "prod"
     Name = "Sample-Ecommerce-Instance"
   }
 }

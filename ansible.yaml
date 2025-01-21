@@ -1,0 +1,51 @@
+- name: Deploy the DevSecOps Project
+  hosts: aws_ec2
+  become: yes
+  remote_user: ec2-user
+  gather_facts: true
+  vars:
+    ansible_ssh_private_key_file: "/etc/ansible/Devsecops.pem"
+    ansible_ssh_user: "ec2-user"
+  tasks:
+    - name: Ensure Docker is installed
+      yum:
+        name: docker
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create application directory
+      file:
+        path: /opt/devsecops
+        state: directory
+
+    - name: Copy JAR/WAR file to instance
+      copy:
+        src: /var/lib/jenkins/workspace/vault/target/project-0.0.1-SNAPSHOT.jar
+        dest: /opt/devsecops/project-0.0.1-SNAPSHOT.jar
+
+    - name: Copy Dockerfile to instance
+      copy:
+        src: /path/to/Dockerfile
+        dest: /opt/devsecops/Dockerfile
+
+    - name: Build Docker image
+      command: >
+        docker build -t sample-ecommerce-java-app:latest /opt/devsecops
+
+    - name: Run Docker container
+      command: >
+        docker run -d --name sample-app -p 8080:8080 sample-ecommerce-java-app:latest
+
+    - name: Ensure the application is running
+      shell: docker ps | grep sample-app
+      register: container_status
+      failed_when: "'sample-app' not in container_status.stdout"
+
+    - name: Notify user of deployment success
+      debug:
+        msg: "Application deployed successfully and running as a container on port 8080."

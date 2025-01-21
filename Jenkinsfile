@@ -94,7 +94,8 @@ pipeline {
                     echo "Logging in to Docker Hub..."
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
-                    echo "Pushing Docker image to Docker Hub..."
+                    echo "Tagging and pushing Docker image..."
+                    docker tag $DOCKER_USERNAME/sample-ecommerce-java-app:latest $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     docker push $DOCKER_USERNAME/sample-ecommerce-java-app:latest
                     '''
                 }
@@ -150,6 +151,18 @@ pipeline {
 
                     echo "Running Snyk Security Scan..."
                     snyk test | tee snyk-report.txt || echo "Vulnerabilities found, continuing pipeline."
+                    '''
+                }
+            }
+        }
+        stage('Ansible Deployment') {
+            steps {
+                script {
+                    echo "Sleeping for 120 seconds before starting deployment..."
+                    sh '''
+                    sleep 120
+                    echo "Running Ansible Playbook..."
+                    ansible-playbook -i /opt/ansible/inventory/aws_ec2.yaml ansible.yaml
                     '''
                 }
             }
