@@ -160,7 +160,7 @@ pipeline {
                 script {
                     echo "Sleeping for 120 seconds before starting deployment..."
                     sh '''
-                    sleep 120
+                    sleep 300
                     echo "Running Ansible Playbook..."
                     ansible-playbook -i /opt/ansible/inventory/aws_ec2.yaml ansible.yaml
                     '''
