@@ -30,16 +30,18 @@ pipeline {
                 }
             }
         }
-        stage('Build WAR') {
+        stage('Run Tests') {
             steps {
-                script {
+                echo "Running npm tests in the 'src' directory..."
+                dir('src') {
                     sh '''
-                    echo "Building project with Maven..."
-                    mvn clean install
+                        npm install
+                        npm test
                     '''
                 }
             }
         }
+        // SonarQube Analysis
         stage('SonarQube Analysis') {
             steps {
                 script {
