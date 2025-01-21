@@ -1,11 +1,12 @@
 pipeline {
     agent any
     environment {
-        VAULT_ADDR = credentials('VAULT_ADDR')
-        VAULT_TOKEN = credentials('VAULT_TOKEN')
-        PATH = "/opt/sonar-scanner/bin:$PATH"
+        VAULT_ADDR = credentials('VAULT_ADDR') // HashiCorp Vault address
+        VAULT_TOKEN = credentials('VAULT_TOKEN') // HashiCorp Vault token
+        PATH = "/opt/sonar-scanner/bin:$PATH" // Adding Sonar Scanner to PATH
     }
     stages {
+        // Test Vault Connection
         stage('Test Vault') {
             steps {
                 sh '''
@@ -18,6 +19,8 @@ pipeline {
                 '''
             }
         }
+
+        // Terraform Security Scan (TFScan)
         stage('TFScan') {
             steps {
                 script {
@@ -30,17 +33,64 @@ pipeline {
                 }
             }
         }
+
+        // Terraform Plan
+        stage('Terraform Plan') {
+            steps {
+                script {
+                    dir('terraform') {
+                        sh '''
+                        echo "Initializing Terraform..."
+                        terraform init
+
+                        echo "Planning Terraform changes..."
+                        terraform plan \
+                            -var="aws_access_key=$(cat ../access_key.txt)" \
+                            -var="aws_secret_key=$(cat ../secret_key.txt)" | tee terraform-plan.txt
+                        '''
+                    }
+                }
+            }
+        }
+
+        // Terraform Apply
+        stage('Terraform Apply') {
+            steps {
+                input {
+                    message "Review the Terraform Plan and approve deployment."
+                }
+                script {
+                    dir('terraform') {
+                        sh '''
+                        echo "Applying Terraform changes..."
+                        terraform apply -auto-approve \
+                            -var="aws_access_key=$(cat ../access_key.txt)" \
+                            -var="aws_secret_key=$(cat ../secret_key.txt)"
+                        '''
+                    }
+                }
+            }
+        }
+
+        // Run Node.js Tests
         stage('Run Tests') {
             steps {
-                echo "Running npm tests in the 'src' directory..."
+                echo "Running npm tests and creating application artifact..."
                 dir('src') {
                     sh '''
+                        echo "Installing dependencies..."
                         npm install
+
+                        echo "Running tests..."
                         npm test
+
+                        echo "Creating app.tar.gz artifact..."
+                        tar -czf app.tar.gz *
                     '''
                 }
             }
         }
+
         // SonarQube Analysis
         stage('SonarQube Analysis') {
             steps {
@@ -51,7 +101,6 @@ pipeline {
                         sonar-scanner \
                             -Dsonar.projectKey=Sample-Ecommerce-Project \
                             -Dsonar.sources=src \
-                            -Dsonar.java.binaries=target/classes \
                             -Dsonar.host.url=http://3.91.226.9:9000/ \
                             -Dsonar.login=sqa_c89317d4b88fd2b1fa3a4c3f09e57cb0e67226d0 | tee sonar-report.txt
                         '''
@@ -59,22 +108,8 @@ pipeline {
                 }
             }
         }
-        stage('Terraform Apply') {
-            steps {
-                script {
-                    dir('terraform') {
-                        sh '''
-                        export AWS_ACCESS_KEY=$(cat ../access_key.txt)
-                        export AWS_SECRET_KEY=$(cat ../secret_key.txt)
-                        terraform init
-                        terraform apply -auto-approve \
-                            -var="aws_access_key=$AWS_ACCESS_KEY" \
-                            -var="aws_secret_key=$AWS_SECRET_KEY"
-                        '''
-                    }
-                }
-            }
-        }
+
+        // Docker Build, Scan & Push
         stage('Docker Build, Scan & Push') {
             steps {
                 script {
@@ -88,20 +123,22 @@ pipeline {
                     export DOCKER_PASSWORD=$(vault kv get -field=password secret/docker)
 
                     echo "Building Docker image..."
-                    docker build -t $DOCKER_USERNAME/sample-ecommerce-java-app:latest .
+                    docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest .
 
                     echo "Scanning Docker image with Trivy..."
-                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-java-app:latest | tee trivy-report.txt
+                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest | tee trivy-report.txt
 
                     echo "Logging in to Docker Hub..."
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
                     echo "Pushing Docker image to Docker Hub..."
-                    docker push $DOCKER_USERNAME/sample-ecommerce-java-app:latest
+                    docker push $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest
                     '''
                 }
             }
         }
+
+        // Nexus Integration
         stage('Nexus Integration') {
             steps {
                 script {
@@ -115,22 +152,21 @@ pipeline {
                     export NEXUS_PASSWORD=$(vault kv get -field=password nexus/credentials)
                     export NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials)
 
-                    echo "Uploading artifact to Nexus..."
-                    ARTIFACT=/var/lib/jenkins/workspace/vault/target/project-0.0.1-SNAPSHOT.jar
-                    if [ ! -f "$ARTIFACT" ]; then
-                        echo "Error: Artifact $ARTIFACT not found. Exiting..."
-                        exit 1
-                    fi
+                    echo "Uploading Node.js application archive to Nexus..."
+                    ARTIFACT=src/app.tar.gz
+                    tar -czf $ARTIFACT src/
 
                     curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD \
                         --upload-file $ARTIFACT \
-                        $NEXUS_REPO_URL/repository/e-commerce/
+                        $NEXUS_REPO_URL/repository/nodejs-app/
 
                     echo "Artifact uploaded successfully to Nexus."
                     '''
                 }
             }
         }
+
+        // Snyk Security Scan
         stage('Snyk Security Scan') {
             steps {
                 script {
@@ -156,6 +192,8 @@ pipeline {
                 }
             }
         }
+
+        // Send Reports to Developers
         stage('Send Reports to Developers') {
             steps {
                 script {
@@ -165,7 +203,7 @@ pipeline {
                     cat sonar-report.txt >> email-body.txt
 
                     echo "\nTerraform Security Scan Results:" >> email-body.txt
-                    cat terraform/tfscan-report.txt >> email-body.txt
+                    cat tfscan-report.txt >> email-body.txt
 
                     echo "\nTrivy Docker Image Scan Results:" >> email-body.txt
                     cat trivy-report.txt >> email-body.txt
@@ -184,7 +222,7 @@ pipeline {
         always {
             script {
                 echo "Cleaning up temporary files..."
-                sh 'rm -f aws_creds.json access_key.txt secret_key.txt tfscan-report.txt trivy-report.txt snyk-report.txt sonar-report.txt email-body.txt'
+                sh 'rm -f aws_creds.json access_key.txt secret_key.txt tfscan-report.txt terraform-plan.txt trivy-report.txt snyk-report.txt sonar-report.txt email-body.txt'
             }
         }
         failure {
