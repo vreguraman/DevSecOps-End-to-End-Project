@@ -1,8 +1,0 @@
-# .snyk file
-version: "v1"
-ignore:
-  SNYK-JAVA-COMH2DATABASE-3146851:
-    - '*'
-  SNYK-JAVA-ORGSPRINGFRAMEWORK-8230365:
-    - '*'
-
