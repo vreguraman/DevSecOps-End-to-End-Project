@@ -5,3 +5,4 @@ ignore:
     - '*'
   SNYK-JAVA-ORGSPRINGFRAMEWORK-8230365:
     - '*'
+
