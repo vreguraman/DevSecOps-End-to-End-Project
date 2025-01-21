@@ -21,7 +21,7 @@ resource "aws_security_group" "example_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["49.204.214.169/32"] # Restrict SSH access to a specific range
+    cidr_blocks = ["0.0.0.0/0"] # Restrict SSH access to a specific range
     description = "Allow SSH from private network"
   }
 
@@ -29,7 +29,7 @@ resource "aws_security_group" "example_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["49.204.214.169/32"] # Restrict HTTP access to a specific range
+    cidr_blocks = ["0.0.0.0/0"] # Restrict HTTP access to a specific range
     description = "Allow HTTP from private network"
   }
 

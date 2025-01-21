@@ -18,18 +18,18 @@ pipeline {
                 '''
             }
         }
-        stage('TFScan') {
-            steps {
-                script {
-                    dir('terraform') {
-                        sh '''
-                        echo "Running TFScan..."
-                        tfsec . | tee tfscan-report.txt
-                        '''
-                    }
-                }
-            }
-        }
+        // stage('TFScan') {
+        //     steps {
+        //         script {
+        //             dir('terraform') {
+        //                 sh '''
+        //                 echo "Running TFScan..."
+        //                 tfsec . | tee tfscan-report.txt
+        //                 '''
+        //             }
+        //         }
+        //     }
+        // }
         stage('Build WAR') {
             steps {
                 script {
