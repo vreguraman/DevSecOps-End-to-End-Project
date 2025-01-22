@@ -192,6 +192,21 @@ pipeline {
                 }
             }
         }
+        stage('Deploy Prometheus') {
+            steps {
+                script {
+                    echo "Deploying Prometheus for monitoring..."
+                    // Use Docker Compose or Terraform to deploy Prometheus
+                    sh '''
+                    docker run -d \
+                        --name prometheus \
+                        -p 9090:9090 \
+                        -v /path/to/prometheus.yml:/etc/prometheus/prometheus.yml \
+                        prom/prometheus
+                    '''
+                }
+            }
+        }
 
         // Send Reports to Developers
         stage('Send Reports to Developers') {
