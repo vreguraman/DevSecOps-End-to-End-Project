@@ -40,7 +40,7 @@ This repository contains an end-to-end **DevSecOps pipeline** that automates the
 ## DevOps Tools Stack
 ---
 
-![](/Images/devsecops1.png.jpg)
+![](/Images/Devsecops-logo.jpg)
 
 ---
 
