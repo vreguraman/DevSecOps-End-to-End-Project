@@ -75,7 +75,7 @@ npm -v
 
 This project uses **OpenTelemetry (OTel)** for distributed tracing and observability. Install the necessary OpenTelemetry libraries:
 
-#### Clone the Project Repository
+### Clone the Project Repository
 
 Follow these steps to clone the project repository and navigate to the project directory:
 
