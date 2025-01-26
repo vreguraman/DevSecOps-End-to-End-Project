@@ -229,6 +229,13 @@ Provide the necessary details to create your Jenkins account, then  select **Ins
    - **Prometheus**: For Monitoring and Observability
    - **OpenTelemetry Agent Host Metrics Monitor Plugin**
 
+Install plugins as showen below:
+
+---
+![](/Images/Jenkins/plugins.jpg)
+![](/Images/Jenkins/plugins-1.jpg)
+---
+
 
 ## Step 3: Install and Configure Tools
 
