@@ -236,8 +236,17 @@ Install plugins as showen below:
 ![](/Images/Jenkins/plugins-1.jpg)
 ---
 
+### Restarting Jenkins
 
-## Step 3: Install and Configure Tools
+After installing plugins or making configuration changes, you may need to restart your Jenkins server. You can do this in one of the following ways:
+
+1. **Using the systemctl command** (Linux systems):
+   ```bash
+   systemctl restart jenkins
+    ```
+
+
+## Configure Tools
 
 ### Install Terraform:
 
@@ -250,6 +259,11 @@ sudo yum install -y terraform
 ```bash
 terraform --version
 ```
+---
+![](/Images/terraform/succesfull-installation%20.jpg)
+
+---
+
 
 ### Install TFScan:
 
@@ -374,17 +388,37 @@ vault server -dev -dev-listen-address="0.0.0.0:8200"
 
 ### Create Your First Job to Verify Jenkins
 
-1. Add a build step to verify tool installations:
+Follow these steps to create a Freestyle Project in Jenkins to verify that Jenkins is properly configured with additional tools:
 
-```bash
-echo "Jenkins is configured with additional tools!"
-tfsec --version
-trivy --version
-snyk --version
-```
+1. **Create a Freestyle Project:**
+   - Go to the **Jenkins Dashboard** and click on **New Item**.
+   - Enter a name for your job (e.g., `Verify-Jenkins`) and select **Freestyle Project**.
+
+2. **Configure the Build Steps:**
+   - Scroll down to the **Build** section and click **Add build step**.
+   - Select **Execute shell** and add the following commands:
+     ```bash
+     echo "Jenkins is configured with additional tools!"
+     tfsec --version
+     trivy --version
+     snyk --version
+     ```
+
+3. **Save and Build:**
+   - Click **Save** to create the job.
+   - Go back to the project dashboard and click **Build Now** to execute the job.
+
+4. **Verify the Output:**
+   - Navigate to the **Console Output** of the build to verify that the commands ran successfully and the versions of `tfsec`, `trivy`, and `snyk` are displayed.
+
 
 2. Save and build the job.
 3. Check the console output to verify the installed versions.
+
+---
+
+![](/Images/version-verification.jpg)
+---
 
 ## Step 4: Configure Jenkins for CI/CD
 
