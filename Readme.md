@@ -5,6 +5,7 @@ This **DevSecOps project** demonstrates the implementation of a secure and autom
 
 ### Key Objectives:
 
+
 **Continuous Integration/Delivery (CI/CD):** Automate application builds, testing, and deployments using **Jenkins, Docker,** and **Node.js.**
 
 **Secrets Management:** Securely handle sensitive data and credentials with **HashiCorp Vault.**
@@ -41,18 +42,21 @@ This **DevSecOps project** demonstrates the implementation of a secure and autom
 ```bash
 # Update the instance
 sudo yum update -y
-
+```
+```bash
 # Install basic utilities
 sudo yum install -y wget git
 ```
 
-## Step 2: Jenkins Installation
+## Jenkins Installation
 
 1. Add the Jenkins repository:
 
 ```bash
 sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat/jenkins.repo
 sudo rpm --import https://pkg.jenkins.io/redhat/jenkins.io-2023.key
+```
+```bash
 sudo yum upgrade -y
 ```
 
@@ -74,15 +78,36 @@ sudo yum install jenkins -y
 
 ```bash
 sudo systemctl enable jenkins
+```
+```bash
 sudo systemctl start jenkins
+```
+```bash
 sudo systemctl status jenkins
 ```
 
-5. Access Jenkins:
-   - Open your browser and navigate to `http://<Jenkins-Instance-IP>:8080`.
-   - Unlock Jenkins using the password found at `/var/lib/jenkins/secrets/initialAdminPassword`.
-   - Install suggested plugins.
-   - Create an admin user.
+### Access Jenkins
+
+Once you access Jenkins at `http://<Jenkins-Instance-IP>:8080`, you will see the following page:
+
+![](/Images/Jenkins/Jenkins-access.jpg)
+
+---
+
+### Retrieve the Initial Admin Password
+Copy the file path shown on the page and run the following command in the terminal:
+```bash
+cat /var/lib/jenkins/secrets/initialAdminPassword
+```
+### Create Jenkins User
+After entering the initial admin password, you will be redirected to a page to set up a Jenkins user account. Fill in the required details as shown below:
+
+![](/Images/Jenkins/Jenkins-create-user.jpg)
+
+---
+
+Provide the necessary details to create your Jenkins account, then  select **Install the suggested plugins** and login to your account.
+
 
 ## Step 3: Install and Configure Tools
 
@@ -90,7 +115,11 @@ sudo systemctl status jenkins
 
 ```bash
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+```
+```bash
 sudo yum install -y terraform
+```
+```bash
 terraform --version
 ```
 
@@ -105,7 +134,11 @@ tfsec --version
 
 ```bash
 curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+```
+```bash
 sudo mv /root/bin/trivy /usr/local/bin/trivy
+```
+```bash
 trivy --version
 ```
 
@@ -122,6 +155,8 @@ snyk --version
 
 ```bash
 sudo yum install docker -y
+```
+```bash
 sudo systemctl enable docker
 sudo systemctl start docker
 ```
@@ -136,12 +171,14 @@ docker run -d --name sonarcontainer -p 9000:9000 sonarqube:latest
 
    - URL: `http://<your-ec2-ip>:9000`.
 
-4. Configure SonarQube in Jenkins:
+![](/Images/Sonar/9.sonar.jpg)
+
+1. Configure SonarQube in Jenkins:
 
    - Add the SonarQube plugin.
    - Configure the server under **Manage Jenkins > Configure System**.
 
-5. Install Sonar Scanner:
+2. Install Sonar Scanner:
 
 ```bash
 wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
