@@ -75,11 +75,18 @@ npm -v
 
 This project uses **OpenTelemetry (OTel)** for distributed tracing and observability. Install the necessary OpenTelemetry libraries:
 
-#### Steps:
-1. Navigate to the `src` directory:
+#### Clone the Project Repository
+
+Follow these steps to clone the project repository and navigate to the project directory:
+
+1. **Clone the Repository**:
+   Run the following command to clone the GitHub repository:
    ```bash
-   cd src
-   ```
+   git clone https://github.com/DevopsProjects05/DevSecOps-End-to-End-Project.git
+    ```
+    ```bash
+    cd DevSecOps-End-to-End-Project/src
+    ```
 
 2. Install OpenTelemetry libraries:
    ```bash
@@ -93,7 +100,7 @@ This project uses **OpenTelemetry (OTel)** for distributed tracing and observabi
 - **@opentelemetry/sdk-trace-node**: Enables OpenTelemetry tracing in the Node.js application.
 - **@opentelemetry/exporter-trace-otlp-http**: Sends trace data from the application to the OpenTelemetry Collector over HTTP using the OTLP protocol.
 
----
+
 
 ### 3. Update the Collector URL in `server.js`
 
@@ -117,7 +124,7 @@ Configure the application to send trace data to the OpenTelemetry Collector.
 
 4. Save and exit the file.
 
----
+
 
 #### 4. Start the Application
 
