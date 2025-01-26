@@ -6,12 +6,20 @@ This **DevSecOps project** demonstrates the implementation of a secure and autom
 ### Key Objectives:
 
 **Continuous Integration/Delivery (CI/CD):** Automate application builds, testing, and deployments using **Jenkins, Docker,** and **Node.js.**
+
 **Secrets Management:** Securely handle sensitive data and credentials with **HashiCorp Vault.**
+
 **Infrastructure as Code (IaC):** Automate infrastructure provisioning and management using **Terraform** and enhance security with **tfsec.**
+
 **Static and Dependency Analysis:** Use **SonarQube, Snyk,** and **Trivy** for code quality, vulnerability scanning, and container image security.
-**Monitoring and Observability:** Implement comprehensive observability using **Prometheus, Grafana,** and **OpenTelemetry.**
+
+**Monitoring and Observability:** Implement comprehensive observability using 
+**Prometheus, Grafana,** and **OpenTelemetry.**
+
 **Artifact Management:** Manage and distribute application artifacts through **Nexus Repository.**
+
 **Configuration Management:** Automate system configurations with **Ansible.**
+
 **Team Collaboration:** Streamline notifications and updates through Slack integrations.
 
 ## Create Jenkins Server
