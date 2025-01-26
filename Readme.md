@@ -48,6 +48,103 @@ sudo yum update -y
 sudo yum install -y wget git
 ```
 
+## Install OpenTelemetry and Project Dependencies
+
+### 1. Install Node.js and npm
+
+Node.js is required to run the project, and npm (Node Package Manager) manages the project's dependencies.
+
+### Installation Commands:
+```bash
+curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
+sudo yum install nodejs -y
+```
+
+### Verify Installation:
+```bash
+node -v
+npm -v
+```
+---
+
+![](/Images/nodejs-version.jpg)
+
+---
+
+### 2. Install Project Dependencies
+
+This project uses **OpenTelemetry (OTel)** for distributed tracing and observability. Install the necessary OpenTelemetry libraries:
+
+#### Steps:
+1. Navigate to the `src` directory:
+   ```bash
+   cd src
+   ```
+
+2. Install OpenTelemetry libraries:
+   ```bash
+   npm install @opentelemetry/sdk-trace-node
+   ```
+   ```bash
+   npm install @opentelemetry/exporter-trace-otlp-http
+   ```
+
+#### Library Overview:
+- **@opentelemetry/sdk-trace-node**: Enables OpenTelemetry tracing in the Node.js application.
+- **@opentelemetry/exporter-trace-otlp-http**: Sends trace data from the application to the OpenTelemetry Collector over HTTP using the OTLP protocol.
+
+---
+
+### 3. Update the Collector URL in `server.js`
+
+Configure the application to send trace data to the OpenTelemetry Collector.
+
+#### Steps:
+1. Open the `server.js` file:
+   ```bash
+   vi server.js
+   ```
+
+2. Locate and update the following line:
+   ```javascript
+   url: 'http://<collector-ip>:4318/v1/traces'
+   ```
+
+3. Replace `<collector-ip>` with the public IP address of your OpenTelemetry Collector:
+   ```javascript
+   url: 'http://public-ip:4318/v1/traces'
+   ```
+
+4. Save and exit the file.
+
+---
+
+#### 4. Start the Application
+
+Run the application to generate and send telemetry data to the OpenTelemetry Collector.
+
+#### Steps:
+1. Start the server:
+   ```bash
+   node server.js
+   ```
+
+2. Access the application at:
+   ```
+   http://<public-ip>:3000
+   ```
+
+---
+![](/Images/1.NodeJs.jpg)
+---
+
+3. To stop the server:
+   ```bash
+   Ctrl + C
+   ```
+
+
+
 ## Jenkins Installation
 
 1. Add the Jenkins repository:
@@ -108,6 +205,30 @@ After entering the initial admin password, you will be redirected to a page to s
 
 Provide the necessary details to create your Jenkins account, then  select **Install the suggested plugins** and login to your account.
 
+#### Configure Jenkins for CI/CD with Additional Tools
+
+##### 1. Install Essential Plugins
+
+1. Go to Jenkins Dashboard > Manage Jenkins > Manage Plugins.
+   
+2. Navigate to the **Available** tab and search for these plugins:
+   
+   - **Git Plugin**: For integrating Git repositories (pre-installed).
+
+   - **Pipeline Plugin**: For creating declarative or scripted pipelines.
+     - Pipeline: Stage View
+     - Pipeline: Declarative Agent API
+
+   - **Terraform Plugin**: For running Terraform commands in Jenkins.
+   - **HashiCorp Vault**: To pull secrets from Vault (optional, based on your goals).
+   - **HashiCorp Vault Pipeline**
+   - **SonarQube Scanner Plugin**: For static code analysis integration.
+   - **Docker**: To run Docker-related commands within Jenkins.
+   - **Snyk Security**: For code and dependency scanning.
+   - **Ansible Plugin**: To automate configuration management.
+   - **Prometheus**: For Monitoring and Observability
+   - **OpenTelemetry Agent Host Metrics Monitor Plugin**
+
 
 ## Step 3: Install and Configure Tools
 
@@ -127,20 +248,30 @@ terraform --version
 
 ```bash
 curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+```
+```bash
 tfsec --version
 ```
+---
+![](/Images/Scanners/tfsec-version.jpg)
 
+---
 ### Install Trivy:
 
 ```bash
 curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
 ```
+
 ```bash
 sudo mv /root/bin/trivy /usr/local/bin/trivy
 ```
 ```bash
 trivy --version
 ```
+---
+![](/Images/Scanners/trivy-version.jpg)
+
+---
 
 ### Install Snyk CLI:
 
