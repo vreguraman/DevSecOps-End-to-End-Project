@@ -77,7 +77,6 @@ This project uses **OpenTelemetry (OTel)** for distributed tracing and observabi
 
 ### Clone the Project Repository
 
-Follow these steps to clone the project repository and navigate to the project directory:
 
 1. **Clone the Repository**:
    Run the following command to clone the GitHub repository:
@@ -212,11 +211,11 @@ After entering the initial admin password, you will be redirected to a page to s
 
 Provide the necessary details to create your Jenkins account, then  select **Install the suggested plugins** and login to your account.
 
-#### Configure Jenkins for CI/CD with Additional Tools
+### Configure Jenkins for CI/CD with Additional Tools
 
-##### 1. Install Essential Plugins
+#### 1. Install Essential Plugins
 
-1. Go to Jenkins Dashboard > Manage Jenkins > Manage Plugins.
+1. Go to Jenkins **Dashboard** > **Manage Jenkins** > **Manage Plugins**.
    
 2. Navigate to the **Available** tab and search for these plugins:
    
@@ -251,7 +250,14 @@ After installing plugins or making configuration changes, you may need to restar
    ```bash
    systemctl restart jenkins
     ```
-
+2. **Using the Jenkins UI:**
+If you're on the plugin installation page, check the *"Restart Jenkins when installation is complete and no jobs are running"* box at the bottom of the page.
+Alternatively, navigate to the following URL in your browser to restart Jenkins:
+```bash
+http://<public-ip>:8080/restart
+```
+Replace <public-ip> with your Jenkins server's public IP address.
+Ensure Jenkins has fully restarted before proceeding with further tasks.
 
 ## Configure Tools
 
@@ -362,15 +368,116 @@ Save the configuration.
 
  **Note:** Store `sonar.projectName`, `sonar.projectKey`, and `Token` in a separate place.
 
-4. Install Sonar Scanner:
+ #### Create a New Project in SonarQube
+1. Log in to SonarQube.
+2. Click **Create New Project** and provide the project name (e.g., `Sample E-Commerce Project`).
+3. Select **Use the global setting**, then click **Create Project**.
 
-```bash
-wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-unzip sonar-scanner-cli-5.0.1.3006-linux.zip
-sudo mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner
-export PATH="/opt/sonar-scanner/bin:$PATH"
-sonar-scanner --version
-```
+#### Generate an Authentication Token
+1. Navigate to **My Account > Security**.
+2. Under **Generate Tokens**, enter a token name (e.g., `SampleProjectToken`).
+3. Select **Global Analysis** from the dropdown.
+4. Click **Generate** and copy the token (save it securely; it will not be displayed again).
+
+#### Install Sonar Scanner
+1. Create a directory for Sonar Scanner:
+   ```bash
+   mkdir -p /downloads/sonarqube
+   cd /downloads/sonarqube
+   ```
+2. Download the latest Sonar Scanner:
+   ```bash
+   wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+   unzip sonar-scanner-cli-5.0.1.3006-linux.zip
+   ```
+   ```bash
+   sudo mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner
+   ```
+3. Add Sonar Scanner to the PATH:
+   ```bash
+   vi ~/.bashrc
+   ```
+   ```bash
+   export PATH="/opt/sonar-scanner/bin:$PATH"
+   ```
+  Add the path as shown below:
+
+  ---
+
+![](/Images/Sonar/sonar-path.jpg)
+
+---
+
+   ```bash
+   source ~/.bashrc
+   ```
+1. Verify the installation:
+   ```bash
+   sonar-scanner --version
+   ```
+#### Analyze Code with Sonar Scanner
+1. Navigate to the `src` directory.
+   ```bash
+   cd src
+   ```
+2. Create and edit the `sonar-project.properties` file:
+   ```bash
+   vi sonar-project.properties           
+   ```
+   Add the following content:
+   ```
+   # Unique project identifier in SonarQube
+   sonar.projectKey=SampleECommersProject     # Replace with your Project key
+
+   # Display name of the project
+   sonar.projectName=Sample E-Commerce Project  # Replace with your Project Name
+
+   # Directory where source code is located (relative to this file)
+   sonar.sources=.
+
+   # URL of the SonarQube server
+   sonar.host.url=http://<your-sonarqube-server-ip>:9000    # Replace with your Sonarqube server IP
+
+   # Authentication token from SonarQube
+   sonar.login=<your-authentication-token>    # Replace with your Token
+   ```
+3. Run the Sonar Scanner:
+   ```bash
+   /opt/sonar-scanner/bin/sonar-scanner
+   ```
+
+  ### You will see below result after running sonar scanner:
+
+  ---
+
+  ![](/Images/Sonar/12.sonar-success.jpg)
+   
+   ---
+
+1. For debugging issues, use:
+   ```bash
+   /opt/sonar-scanner/bin/sonar-scanner -X
+   ```
+
+   If you get an error:
+   - Ensure your SonarQube server IP is configured in Jenkins.
+   - Verify that your project key and authentication token are correct.
+   - Make sure you are in the correct path (`/src`).
+   - Confirm that the `sonar-project.properties` file exists in the `/src` directory.
+
+#### View Results in SonarQube
+1. Open your browser and navigate to `http://<your-sonarqube-server-ip>:9000`.
+2. Log in to the SonarQube dashboard.
+3. Locate the project (e.g., `Sample E-Commerce Project`).
+4. View analysis results, including security issues, reliability, maintainability, and code coverage.
+
+### The following output will be visible upon successful execution:
+
+---
+
+![](//Images/Sonar/Sonarqube-passed.jpg)
+
+---
 
 ### Install Vault:
 
