@@ -475,7 +475,7 @@ Save the configuration.
 
 ---
 
-![](//Images/Sonar/Sonarqube-passed.jpg)
+![](/Images/Sonar/Sonarqube-passed.jpg)
 
 ---
 
