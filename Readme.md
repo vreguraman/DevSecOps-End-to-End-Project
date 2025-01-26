@@ -170,15 +170,40 @@ docker run -d --name sonarcontainer -p 9000:9000 sonarqube:latest
 3. Access SonarQube:
 
    - URL: `http://<your-ec2-ip>:9000`.
+---
 
 ![](/Images/Sonar/9.sonar.jpg)
 
-1. Configure SonarQube in Jenkins:
+---
 
-   - Add the SonarQube plugin.
-   - Configure the server under **Manage Jenkins > Configure System**.
+- Login: Username: `admin`, Password: `admin` (you will be prompted to reset the password).
 
-2. Install Sonar Scanner:
+   Provide a new Password : `Example@12345`
+
+---
+   ![](/Images/Sonar/10.sonar-update.jpg)
+
+---
+
+#### Add SonarQube Configuration to Jenkins
+1. Go to **Manage Jenkins > Configure System**.
+2. Scroll to **SonarQube Servers** and click **Add SonarQube**.
+3. Enter the following details:
+   - **Name**: SonarQube server (or any identifier).
+   - **Server URL**: `http://<your-sonarqube-server-ip>:9000`.
+
+---
+
+![](/Images/Sonar/14.sonarserver-add.jpg)
+
+---
+
+Save the configuration.
+
+
+ **Note:** Store `sonar.projectName`, `sonar.projectKey`, and `Token` in a separate place.
+
+4. Install Sonar Scanner:
 
 ```bash
 wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
