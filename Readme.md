@@ -1158,7 +1158,7 @@ Go to Dashboards > toggle menu > dashboards > new> Import in Grafana.
 
 
 ---
-![](/images/grafana-nodejs-id.jpg)
+![](/Images/grafana-nodejs-id.jpg)
 
 ---
 
@@ -1169,7 +1169,7 @@ Node js Dashboard: **11159** and click on load and select **`Prometheus`** in pr
 #### The interface will appear as follows:
 
 ---
-![](/images/grafana-load-nodejs.jpg)
+![](/Images/grafana-load-nodejs.jpg)
 
 ---
 
