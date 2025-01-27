@@ -1130,7 +1130,7 @@ Change the password upon first login.
 ### Once you login you will see Grafana Dashboard as shown below:
 ---
 
-![](/images/grafana-dashboard.jpg)
+![](/Images/grafana-dashboard.jpg)
 
 ---
 
