@@ -690,6 +690,32 @@ To verify Vault integration with Jenkins, follow these steps:
 
 ---
 
+### Integrating tfsec for Terraform Scanning
+
+To scan Terraform files for potential security vulnerabilities using `tfsec`, follow these steps:
+
+1. **Ensure a Terraform File Exists**:
+   - Confirm that the required Terraform file (`.tf`) is available in the `/src` directory.
+
+2. **Navigate to the Terraform Directory**:
+   ```bash
+   cd /root/DevSecOps-End-to-End-Project/terraform
+   ```
+3. **Run tfsec**:
+- Execute the following command to perform the security scan:
+
+   ```bash
+   tfsec .
+   ```
+4. **Analyze the Output**:
+
+- Review the results of the scan for any identified security issues and resolve them as needed.
+
+---
+![](/Images/tfsec-ouput.jpg)
+
+---
+
 ## Step 6: Integrate Trivy for Docker Image Scanning
 
 1. Create a Dockerfile:
