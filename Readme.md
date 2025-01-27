@@ -551,52 +551,144 @@ Save the configuration.
 
 ---
 
-### Install Vault:
+### HashiCorp Vault Integration
+
+In this project, HashiCorp Vault is shared with the Jenkins instance to securely manage AWS credentials and other secrets required by Terraform.
+
+1. **Open Port for Vault**: Ensure port `8200` is open for Vault communication.
+
+2. **Why Vault?**
+   HashiCorp Vault is used to:
+   - Securely store and manage sensitive information.
+   - Dynamically generate AWS credentials for Terraform.
+
+3. **Steps for Vault Integration**:
+   Before proceeding, we need to integrate Vault:
+
+   - **Install Vault**:
+     ```bash
+     sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+     sudo yum install -y vault
+     ```
+
+   - **Start Vault in Development Mode**:
+     ```bash
+     vault server -dev -dev-listen-address="0.0.0.0:8200"
+     ```
+   **Note:** Copy the Root token to login into Hashicorp vault server
+   - **Run Vault in Background (Optional)**:
+     ```bash
+     vault server -dev -dev-listen-address="0.0.0.0:8200" &
+     ```
+
+4. **Access Vault Server**
+
+To access the Vault server, open your web browser and navigate to:
+
+   ```bash
+   http://<public-ip>:8200
+   ```
+   ---
+   ![](/Images/vault-login.jpg)
+
+   ---
+
+Enter the root token to login.
+
+
+## Integrate Vault for Secrets Management
+
+### Open a Separate Terminal for Configuration
+
+1. Right-click on the tab of your terminal session.
+2. From the context menu, select the option **'Duplicate Session'**.
+3. This will open a new tab with a duplicate of your current terminal session, which you can use to continue the setup process.
+4. After entering into the duplicate terminal, get sudo access and follow the steps below.
+
+---
+
+### Step-by-Step Configuration
+
+1. **Set Vault's Environment Variables**:
+   ```bash
+   export VAULT_ADDR=http://0.0.0.0:8200
+   ```
+   ```bash
+   export VAULT_TOKEN=<your-root-token>
+   ```
+2. **Enable the AWS Secrets Engine**:
+   ```bash
+   vault secrets enable -path=aws aws
+   ```
+3. **Configure AWS Credentials in Vault**:
+   ```bash
+   vault write aws/config/root \
+    access_key=<your-Access-key> \
+    secret_key=<your-Secret-key>
+   ```
+4. Create a Vault Role for AWS Credentials
 
 ```bash
-sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+vault write aws/roles/dev-role \
+ credential_type=iam_user \
+ policy_document=-<<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": ["ec2:*", "sts:GetCallerIdentity"],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
 ```
-```bash
-sudo yum install -y vault
-```
-```bash
-vault server -dev -dev-listen-address="0.0.0.0:8200"
-```
+### Testing HashiCorp Vault in a Freestyle Jenkins Job
 
+To verify Vault integration with Jenkins, follow these steps:
 
+#### Add Vault URL to Jenkins
+1. Go to **Manage Jenkins > System > Vault Plugin**.
+2. Enter the Vault URL: `http://<public-ip>:8200`.
+3. Click **Apply** and **Save**.
 
-## Step 4: Configure Jenkins for CI/CD
+#### Steps to Create and Configure the Jenkins Job
+1. **Create a New Freestyle Job**:
+   - Go to **Jenkins Dashboard > New Item**.
+   - Enter a job name (e.g., `Test-Vault`).
+   - Select **Freestyle Project** and click **OK**.
 
-### Install Plugins:
+2. **Add Build Step**:
+   - Under **Build**, click on **Add Build Step**.
+   - Select **Execute Shell**.
 
-1. Navigate to **Manage Jenkins > Manage Plugins > Available**.
-2. Install the following plugins:
-   - Git Plugin
-   - Pipeline Plugin
-   - Terraform Plugin
-   - SonarQube Scanner Plugin
-   - HashiCorp Vault Plugin
-   - Docker Plugin
-   - Snyk Security Plugin
+3. **Add the Following Shell Script**:
+   ```bash
+   # Export Vault address and token
+   export VAULT_ADDR=http://<public-ip>:8200
+   export VAULT_TOKEN=<YOUR_VAULT_TOKEN>
 
-## Step 5: Integrate Vault for Secrets Management
+   echo "Testing Vault Connection..."
+   # Read AWS credentials from Vault
+   vault read -format=json aws/creds/dev-role > aws_creds.json
+   jq -r '.data.access_key' aws_creds.json
+   jq -r '.data.secret_key' aws_creds.json
+   ```
 
-1. Enable AWS Secrets Engine:
+4. **Run the Job**:
 
-```bash
-vault secrets enable -path=aws aws
-```
+- Click Save and then Build Now.
+5. Verify the Output:
 
-2. Configure AWS Credentials in Vault:
+- Check the Console Output to ensure:
+- Vault connection is successful.
+- AWS credentials are retrieved and displayed.
 
-```bash
-vault write aws/config/root \
-  access_key=<your-access-key> \
-  secret_key=<your-secret-key>
-```
+---
+![](/Images/vault-job-success.jpg)
 
-3. Retrieve Credentials in Jenkins Pipeline:
-   - Use the Vault Plugin to pull secrets dynamically.
+---
 
 ## Step 6: Integrate Trivy for Docker Image Scanning
 
