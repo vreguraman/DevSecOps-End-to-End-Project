@@ -716,33 +716,93 @@ To scan Terraform files for potential security vulnerabilities using `tfsec`, fo
 
 ---
 
-## Step 6: Integrate Trivy for Docker Image Scanning
 
-1. Create a Dockerfile:
 
-```dockerfile
-FROM node:16-alpine
-WORKDIR /app
-COPY package.json .
-RUN npm install
-COPY . .
-EXPOSE 3000
-CMD ["npm", "start"]
-```
+## Integrating Trivy for Container Image Scanning
 
-2. Build and Scan the Image:
-
+### Install Docker
+If Docker is not already installed, use the following command to install Docker:
 ```bash
-docker build -t sample-app .
-trivy image sample-app
+sudo yum install docker -y
 ```
 
-3. Push the Image:
+### Steps to Integrate Trivy for Image Scanning
 
-```bash
-docker login
-# Tag and push
-```
+1. **Create the Dockerfile**:
+   - The Dockerfile is already available in the `/src` directory. Below is an example of the Dockerfile:
+   ```dockerfile
+   FROM node:16-alpine
+   WORKDIR /app
+   COPY package.json .
+   RUN npm install
+   COPY . .
+   EXPOSE 3000
+   CMD ["npm", "start"]
+   ```
+   - Save this file in the root directory of your project.
+
+2. **Build the Docker Image**:
+   - Navigate to your project directory and run:
+   ```bash
+   docker build -t sample-ecommerce-app .
+   ```
+
+3. **Run the Docker Container (Optional for Testing)**:
+   - To test the container, run:
+   ```bash
+   docker run -p 3000:3000 sample-ecommerce-app
+   ```
+   - Access the application in your browser at:
+     ```
+     http://<your-server-ip>:3000
+     ```
+
+4. **Scan the Image with Trivy**:
+   - Use Trivy to scan the Docker image for vulnerabilities:
+   ```bash
+   trivy image sample-ecommerce-app
+   ```
+
+5. **Analyze the Output**:
+   - Review the vulnerabilities identified in the scan and address them by updating dependencies or modifying the Dockerfile.
+
+---
+
+![](/Images/trivy-succes.jpg)
+---
+
+6. **Clean Up**:
+   - Stop and remove the running container (if applicable):
+   ```bash
+   docker stop <container-id>
+   docker rm <container-id>
+   ```
+
+### Push Docker Image to a Container Registry
+
+To store and share your Docker image, push it to a container registry like Docker Hub, Amazon ECR, or Azure ACR.
+
+1. **Log in to Docker Hub**:
+   ```bash
+   docker login -u <your-dockerhub-username> -p <your-dockerhub-password>
+   ```
+
+2. **Tag the Docker Image**:
+   ```bash
+   docker tag sample-ecommerce-app <your-registry>/sample-ecommerce-app:nodejs
+   ```
+
+3. **Push the Image to the Registry**:
+   ```bash
+   docker push <your-registry>/sample-ecommerce-app:nodejs
+   ```
+4. Verify on Docker Hub.
+   
+#### After running the steps, the output will appear as follows:
+
+![](/Images/dockerhub-success.jpg)
+
+
 
 ## Step 7: Nexus Repository
 
