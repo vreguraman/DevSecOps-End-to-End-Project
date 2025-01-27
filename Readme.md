@@ -953,6 +953,236 @@ The `-field=api_token` flag extracts only the token value.
 
 ---
 
+## Monitoring with Prometheus and Grafana
+
+### Add Prometheus to Node.js Application
+1. Install Prometheus client:
+   ```bash
+   npm install prom-client
+   ```
+2. Expose metrics in `server.js`. (included expose metrics in server.js)
+
+#### Next Steps
+1. Test this updated `server.js` locally:
+   ```bash
+   node server.js
+   ```
+2. Access Prometheus metrics at: `http://<public-ip>:3000/metrics` to ensure it is working as expected.
+
+### You will see the metrics once you access the URL:
+
+---
+
+![](/Images/metrics.jpg)
+
+---
+
+### Open a Separate Terminal for Prometheus Setup
+1. **Right-click** on the tab of your terminal session.
+2. From the context menu, select the option **'Duplicate Session'**.
+3. This will open a new tab with a duplicate of your current terminal session, which you can use to continue the setup process.
+4. After entering into the duplicate terminal, get sudo access and navigate to:
+   ```bash
+   cd Devops-CICD-End-to-End/src/
+   ```
+
+
+
+### Install and Configure Prometheus
+1. Download and run Prometheus:
+   ```bash
+   wget https://github.com/prometheus/prometheus/releases/download/v2.47.0/prometheus-2.47.0.linux-amd64.tar.gz
+   ```
+   ```bash
+   tar -xvzf prometheus-2.47.0.linux-amd64.tar.gz
+   ```
+   ```bash
+   cd prometheus-2.47.0.linux-amd64
+   ```
+   
+
+#### Configure Prometheus
+
+Inside the Prometheus Folder:
+
+1. Locate the `scrape_configs:` section.
+2. Find `- job_name:`.
+3. Replace the job name with `"nodejs-app"`.
+
+```yaml
+scrape_configs:
+  - job_name: "nodejs-app"
+    # Additional configuration here
+```
+4. Save the file in the same directory as Prometheus.
+
+#### Run Prometheus
+
+To start the Prometheus server, use the following command:
+
+  ```bash
+   ./prometheus --config.file=prometheus.yml
+   ```
+**Prometheus Server**: http://public-ip:9090/
+
+##### Verify Prometheus Server
+
+- Open the Prometheus server in your browser.
+
+- Navigate to the Status tab.
+
+- Choose Targets from the dropdown.
+
+
+### Below is the result you can expect:
+
+---
+
+![](/Images/prometheus.jpg)
+
+---
+
+### Open a Separate Terminal for Grafana Setup
+1. **Right-click** on the tab of your terminal session.
+2. From the context menu, select the option **'Duplicate Session'**.
+3. This will open a new tab with a duplicate of your current terminal session, which you can use to continue the setup process.
+4. After entering into the duplicate terminal, get sudo access and navigate to:
+   ```bash
+   cd Devops-CICD-End-to-End/src/
+   ```
+
+### Install and Configure Grafana
+1. Download and run Grafana:
+   ```bash
+   wget https://dl.grafana.com/oss/release/grafana-10.0.0.linux-amd64.tar.gz
+   ```
+   ```bash
+   tar -xvzf grafana-10.0.0.linux-amd64.tar.gz
+   ```
+   ```bash
+   cd grafana-10.0.0/bin
+   ```
+   Run Grafana
+
+   ```bash
+   ./grafana-server
+   ```
+
+### Resolve Port Conflict with Grafana
+
+You may encounter the following error because Grafana tries to access port 3000, which is already occupied by Node.js. To resolve this, we need to change the Grafana port to 3001.
+
+#### Steps to Change the Grafana Port
+
+1.Find the `defaults.ini` file by running the following command:
+```bash
+find / -name defaults.ini 2>/dev/null
+```
+
+2.Navigate to the `conf` directory:
+```bash
+cd ../conf
+```
+
+3.Edit the `defaults.ini` file:
+```bash
+vi defaults.ini
+```
+4.Add the following line to set the `Grafana port` to 3001:
+```bash
+http_port = 3001
+```
+---
+
+![](/Images/port-change.jpg)
+
+--- 
+
+#### Restart Grafana
+Now, navigate back to the Grafana execution folder:
+
+```bash
+cd /root/Devops-CICD-End-to-End/src/prometheus-2.47.0.linux-amd64/grafana-10.0.0/bin
+```
+Run Grafana again:
+```bash
+./grafana-server  
+```
+
+   Access Grafana: `http://<server-ip>:3001`.
+
+### You will see the below screen:
+
+   ---
+![](/Images/grafana-1.jpg)
+
+   ---
+
+Login using default credentials:
+
+Username: admin
+
+Password: admin
+
+Change the password upon first login.
+
+
+### Once you login you will see Grafana Dashboard as shown below:
+---
+
+![](/images/grafana-dashboard.jpg)
+
+---
+
+#### Configure Prometheus as a Data Source
+Add Prometheus as a data source.
+ -  In Grafana, go to Configuration > **Data Sources**
+ -  Click **Add data source.**
+
+### The following page will appear:
+
+   ---
+   ![](/images/grafana-datasource.jpg)
+
+   ---
+   Select **`Prometheus`** from the list
+   Enter Prometheus URL as shown below:
+
+---
+   ![](/Images/grafana-prometheus.jpg)
+
+---
+
+#### Import a Pre-Built Dashboard
+Go to Dashboards > toggle menu > dashboards > new> Import in Grafana.
+
+
+---
+![](/images/grafana-nodejs-id.jpg)
+
+---
+
+Enter a **Dashboard ID:**
+
+Node js Dashboard: **11159** andclick on load and select **`Prometheus`** in prometheus
+
+#### The interface will appear as follows:
+
+---
+![](/images/grafana-load-nodejs.jpg)
+
+---
+
+click on **import.**
+
+### Here is the NodeJS Application Dashboard result after the process completes
+
+---
+![](/images/grafana-nodejs.jpg)
+
+---
+
+
 ## Conclusion:
 
 This setup ensures a complete CI/CD pipeline with integrated security tools for DevSecOps practices. Modify and scale as needed for specific project requirements.
