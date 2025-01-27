@@ -1164,7 +1164,7 @@ Go to Dashboards > toggle menu > dashboards > new> Import in Grafana.
 
 Enter a **Dashboard ID:**
 
-Node js Dashboard: **11159** andclick on load and select **`Prometheus`** in prometheus
+Node js Dashboard: **11159** and click on load and select **`Prometheus`** in prometheus
 
 #### The interface will appear as follows:
 
@@ -1178,9 +1178,11 @@ click on **import.**
 ### Here is the NodeJS Application Dashboard result after the process completes
 
 ---
-![](/images/grafana-nodejs.jpg)
+![](/Images/Grafana-App-Dashboard.jpg)
 
 ---
+
+
 
 
 ## Conclusion:
