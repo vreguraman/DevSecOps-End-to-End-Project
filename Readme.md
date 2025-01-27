@@ -821,6 +821,10 @@ docker run -d -p 8081:8081 --name nexus sonatype/nexus3
    ```
    http://<your-host-ip>:8081
    ```
+ ---
+   ![](/Images/nexus-launch.jpg)
+
+   ---
 2. Retrieve the Admin Password:
    - Run the following command to get the admin password:
      ```bash
@@ -829,13 +833,24 @@ docker run -d -p 8081:8081 --name nexus sonatype/nexus3
 3. The default credentials are:
    - **Username**: `admin`
    - **Password**: Found in the container at `/nexus-data/admin.password`.
+---
 
-4. Update your password after the first login.
-5. Select: Enable anonymous access → Click Next → Finish the setup.
+![](/Images/nexus-credentials.jpg)
+
+---
+
+4. Update your password after the first login as shown below
+---
+![](/Images/nexus-credentials-update.jpg)
+---
+1. Select: Enable anonymous access → Click Next → Finish the setup.
 
 ### Configure Nexus
 
-#### Create a Docker Repository
+#### Create a Docker Repository as shown below
+
+![](/Images/nexus-config.jpg)
+
 1. Navigate to Nexus Repositories:
    - Click on the "Settings" (gear icon) → "Repositories".
 
@@ -850,11 +865,93 @@ docker run -d -p 8081:8081 --name nexus sonatype/nexus3
 4. Save the Configuration.
 
 
-3. Store Nexus Credentials in Vault:
+## Managing Credentials in HashiCorp Vault
 
+
+
+### Storing Credentials in Vault
+
+#### 1. Enable the KV Secrets Engine
+Ensure the KV secrets engine is enabled in Vault to securely store credentials.
 ```bash
-vault kv put nexus/credentials username="admin" password="<password>"
+vault secrets enable -path=nexus kv
 ```
+
+
+#### 2. Store Nexus Credentials
+Use the `vault kv put` command to securely store your Nexus credentials:
+```bash
+vault kv put nexus/credentials username="your-nexus-username" password="your-nexus-password"
+```
+
+You can also include additional details, such as the Nexus repository URL or token:
+```bash
+vault kv put nexus/credentials \
+    username="your-nexus-username" \
+    password="your-nexus-password" \
+    repo_url=https://nexus.example.com
+```
+Replace `https://nexus.example.com` with your Nexus repository URL.
+
+---
+
+#### 3. Retrieve Nexus Credentials
+To fetch the stored credentials:
+- Retrieve all stored credentials:
+  ```bash
+  vault kv get nexus/credentials
+  ```
+
+---
+
+#### Store Docker Credentials:
+```bash
+vault kv put secret/docker username="<user-name>" password="<your-password>"
+```
+
+#### Retrieve Docker Credentials:
+- Fetch the username:
+  ```bash
+  vault kv get -field=username secret/docker
+  ```
+- Fetch the password:
+  ```bash
+  vault kv get -field=password secret/docker
+  ```
+
+---
+
+### Store Snyk Token
+
+### 1. Sign In to Snyk
+- Go to the [Snyk login page](https://snyk.io/).
+- Log in using your preferred method (e.g., email/password, GitHub, GitLab, or SSO).
+
+### 2. Navigate to Your API Token
+- Click on your profile picture or initials in the top-right corner.
+- Select **Account Settings** from the dropdown menu.
+- Locate your API token under the **API Token** section.
+
+### 3. Enable the KV Secrets Engine (if not already enabled)
+```bash
+vault secrets enable -path=snyk kv
+```
+- `-path=snyk`: Specifies a custom path for storing Snyk-related secrets. You can customize this path as needed.
+
+### 4. Store the Snyk Token
+```bash
+vault kv put snyk/token api_token="your-snyk-token"
+```
+Replace `your-snyk-token` with your actual Snyk token.
+
+### 5. Retrieve the Snyk Token
+To fetch the token programmatically or manually:
+```bash
+vault kv get -field=api_token snyk/token
+```
+The `-field=api_token` flag extracts only the token value.
+
+---
 
 ## Conclusion:
 
