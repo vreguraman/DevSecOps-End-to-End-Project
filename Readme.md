@@ -259,6 +259,26 @@ http://<public-ip>:8080/restart
 Replace <public-ip> with your Jenkins server's public IP address.
 Ensure Jenkins has fully restarted before proceeding with further tasks.
 
+
+### Troubleshooting: Updating Jenkins IP Address
+
+If you stop the Jenkins instance and start it again, you may experience slowness when accessing Jenkins or making changes. This happens because the Jenkins IP address changes after restarting the instance.
+
+To resolve this issue, follow these steps to update the latest IP address in Jenkins:
+
+1. Open the Jenkins configuration file:
+   ```bash
+   vi /var/lib/jenkins/jenkins.model.JenkinsLocationConfiguration.xml
+   ```
+2. Update the `Jenkins URL` field with the new public IP address of the instance.
+
+3. Save the changes and restart Jenkins:
+   ```bash
+   systemctl restart jenkins
+   ```
+
+
+
 ## Configure Tools
 
 ### Install Terraform:
@@ -311,8 +331,59 @@ trivy --version
 
 ```bash
 npm install -g snyk
+```
+```bash
 snyk --version
 ```
+
+### Configure Global Tools in Jenkins
+
+1. **Git**:
+   - Go to **Manage Jenkins > Global Tool Configuration**.
+   - Under Git, click **Add Git** and set the path to `/usr/bin/git`.
+
+2. **Terraform**:
+   - Add Terraform under Terraform installations.
+   - Ensure the binary is installed at `/usr/bin/`.
+
+3. **Ansible**:
+   - Add Ansible installation and set the path to `/usr/bin/`.
+
+### Create Your First Job to Verify Jenkins
+
+Follow these steps to create a Freestyle Project in Jenkins to verify that Jenkins is properly configured with additional tools:
+
+1. **Create a Freestyle Project:**
+   - Go to the **Jenkins Dashboard** and click on **New Item**.
+   - Enter a name for your job (e.g., `Verify-Jenkins`) and select **Freestyle Project**.
+
+2. **Configure the Build Steps:**
+   - Scroll down to the **Build** section and click **Add build step**.
+   - Select **Execute shell** and add the following commands:
+     ```bash
+     echo "Jenkins is configured with additional tools!"
+     tfsec --version
+     trivy --version
+     snyk --version
+     ```
+
+3. **Save and Build:**
+   - Click **Save** to create the job.
+   - Go back to the project dashboard and click **Build Now** to execute the job.
+
+4. **Verify the Output:**
+   - Navigate to the **Console Output** of the build to verify that the commands ran successfully and the versions of `tfsec`, `trivy`, and `snyk` are displayed.
+
+
+2. Save and build the job.
+3. Check the console output to verify the installed versions.
+
+---
+
+![](/Images/version-verification.jpg)
+---
+
+
 
 ### Install and Configure SonarQube:
 
@@ -415,6 +486,8 @@ Save the configuration.
    ```bash
    sonar-scanner --version
    ```
+
+ Ensure “SonarQube Scanner for Jenkins” plugin is installed.
 #### Analyze Code with Sonar Scanner
 1. Navigate to the `src` directory.
    ```bash
@@ -427,19 +500,18 @@ Save the configuration.
    Add the following content:
    ```
    # Unique project identifier in SonarQube
-   sonar.projectKey=SampleECommersProject     # Replace with your Project key
+   sonar.projectKey=SampleECommersProject     
 
    # Display name of the project
-   sonar.projectName=Sample E-Commerce Project  # Replace with your Project Name
-
+   sonar.projectName=Sample E-Commerce Project 
    # Directory where source code is located (relative to this file)
    sonar.sources=.
 
    # URL of the SonarQube server
-   sonar.host.url=http://<your-sonarqube-server-ip>:9000    # Replace with your Sonarqube server IP
+   sonar.host.url=http://<your-sonarqube-server-ip>:9000    
 
    # Authentication token from SonarQube
-   sonar.login=<your-authentication-token>    # Replace with your Token
+   sonar.login=<your-authentication-token>    
    ```
 3. Run the Sonar Scanner:
    ```bash
@@ -483,56 +555,15 @@ Save the configuration.
 
 ```bash
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+```
+```bash
 sudo yum install -y vault
+```
+```bash
 vault server -dev -dev-listen-address="0.0.0.0:8200"
 ```
 
-### Configure Global Tools in Jenkins
 
-1. **Git**:
-   - Go to **Manage Jenkins > Global Tool Configuration**.
-   - Under Git, click **Add Git** and set the path to `/usr/bin/git`.
-
-2. **Terraform**:
-   - Add Terraform under Terraform installations.
-   - Ensure the binary is installed at `/usr/bin/`.
-
-3. **Ansible**:
-   - Add Ansible installation and set the path to `/usr/bin/`.
-
-### Create Your First Job to Verify Jenkins
-
-Follow these steps to create a Freestyle Project in Jenkins to verify that Jenkins is properly configured with additional tools:
-
-1. **Create a Freestyle Project:**
-   - Go to the **Jenkins Dashboard** and click on **New Item**.
-   - Enter a name for your job (e.g., `Verify-Jenkins`) and select **Freestyle Project**.
-
-2. **Configure the Build Steps:**
-   - Scroll down to the **Build** section and click **Add build step**.
-   - Select **Execute shell** and add the following commands:
-     ```bash
-     echo "Jenkins is configured with additional tools!"
-     tfsec --version
-     trivy --version
-     snyk --version
-     ```
-
-3. **Save and Build:**
-   - Click **Save** to create the job.
-   - Go back to the project dashboard and click **Build Now** to execute the job.
-
-4. **Verify the Output:**
-   - Navigate to the **Console Output** of the build to verify that the commands ran successfully and the versions of `tfsec`, `trivy`, and `snyk` are displayed.
-
-
-2. Save and build the job.
-3. Check the console output to verify the installed versions.
-
----
-
-![](/Images/version-verification.jpg)
----
 
 ## Step 4: Configure Jenkins for CI/CD
 
