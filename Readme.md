@@ -757,6 +757,8 @@ sudo yum install docker -y
      http://<your-server-ip>:3000
      ```
 
+     ![](/Images/1.NodeJs.jpg)
+
 4. **Scan the Image with Trivy**:
    - Use Trivy to scan the Docker image for vulnerabilities:
    ```bash
@@ -799,22 +801,54 @@ To store and share your Docker image, push it to a container registry like Docke
 4. Verify on Docker Hub.
    
 #### After running the steps, the output will appear as follows:
+---
 
 ![](/Images/dockerhub-success.jpg)
 
+---
 
 
-## Step 7: Nexus Repository
+## Running Nexus Repository as Container
 
-1. Run Nexus as a Container:
-
+### Run the Nexus Container
+To deploy the Nexus Repository as a container, run the following command:
 ```bash
-docker run -d -p 8081:8081 -p 8082:8082 --name nexus sonatype/nexus3
+docker run -d -p 8081:8081 --name nexus sonatype/nexus3
 ```
 
-2. Configure Nexus:
+### Access Nexus
+1. Open your browser and navigate to:
+   ```
+   http://<your-host-ip>:8081
+   ```
+2. Retrieve the Admin Password:
+   - Run the following command to get the admin password:
+     ```bash
+     docker exec -it nexus cat /nexus-data/admin.password
+     ```
+3. The default credentials are:
+   - **Username**: `admin`
+   - **Password**: Found in the container at `/nexus-data/admin.password`.
 
-   - Create a Docker repository.
+4. Update your password after the first login.
+5. Select: Enable anonymous access → Click Next → Finish the setup.
+
+### Configure Nexus
+
+#### Create a Docker Repository
+1. Navigate to Nexus Repositories:
+   - Click on the "Settings" (gear icon) → "Repositories".
+
+2. Create a New Repository:
+   - Click on "Create repository".
+   - Choose **"docker (hosted)"** for pushing Docker images.
+
+3. Configure the Repository:
+   - **Name**: Enter a name for the repository (e.g., `docker-hosted`).
+   - Allow anonymous Docker pull: Enable this option if needed.
+
+4. Save the Configuration.
+
 
 3. Store Nexus Credentials in Vault:
 
