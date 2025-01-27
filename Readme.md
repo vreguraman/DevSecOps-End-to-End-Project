@@ -1181,9 +1181,99 @@ click on **import.**
 ![](/Images/Grafana-App-Dashboard.jpg)
 
 ---
+## OpenTelemetry Setup and Configuration
+Since we have already installed the OpenTelemetry-related dependencies and updated the `collectorUrl` in `server.js` earlier, let's proceed with downloading the OpenTelemetry Collector.
 
+ ### Download and Set Up OpenTelemetry Collector
+The OpenTelemetry Collector processes and exports telemetry data from the application to a desired backend.
 
+#### **Download the Collector**
+```bash
+wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.83.0/otelcol-contrib_0.83.0_linux_amd64.tar.gz
+```
+- **Why:** Downloads the OpenTelemetry Collector binary (Contrib version).
+- **Result:** A `.tar.gz` file is downloaded.
 
+#### **Extract the File**
+```bash
+tar -xvf otelcol-contrib_0.83.0_linux_amd64.tar.gz
+```
+
+#### Move the Binary to a System-Wide Location
+```bash
+sudo mv otelcol-contrib /usr/local/bin/otelcol
+```
+- **Why:** Places the binary in a directory included in your system’s PATH, so you can run it from anywhere.
+- **Result:** The Collector is installed and ready to use.
+
+#### Verify Installation
+```bash
+otelcol --version
+```
+- **Why:** Confirms that the Collector is installed correctly.
+- **Result:** Displays the version of the Collector.
+
+---
+
+### Run the OpenTelemetry Collector
+Ensure the `otel-collector-config.yaml` file is present in your directory. Run the Collector with the configuration file.
+```bash
+otelcol --config otel-collector-config.yaml
+```
+- **Why:** Starts the Collector with the specified configuration.
+  - Receives traces from your application.
+  - Processes and exports traces to the desired backend (e.g., logging, Jaeger).
+- **Result:** The Collector is running and ready to process telemetry data.
+
+Check the Collector logs to confirm traces are being received:
+```bash
+INFO    TracesExporter  {"kind": "exporter", "data_type": "traces", "resource spans": 1, "spans": 1}
+```
+
+---
+
+### 8. Enhance Tracing in the Application (*This step is already included in server.js*)
+Add custom spans to improve the observability of specific routes.
+
+#### **Edit `server.js` to Add Custom Spans**
+```bash
+vi /root/otel-ecommerce-integration/src/server.js
+```
+Add the following code to create a custom span for the `/custom` route:
+```javascript
+app.get('/custom', (req, res) => {
+    const span = tracer.startSpan('Custom Route Span');
+    res.send('This is a custom route');
+    span.end();
+});
+```
+- **Why:** Custom spans provide detailed observability for specific operations.
+- **Result:** Requests to `/custom` will generate a new span named `Custom Route Span`.
+
+#### **Restart the Application**
+```bash
+node server.js
+```
+- **Why:** Applies the changes to the server.
+- **Result:** The application restarts with the new custom span functionality.
+
+#### **Test the Custom Route**
+Visit the custom route in your browser or using `curl`:
+```bash
+http://<your-server-ip>:3000/custom
+```
+- **Why:** Generates traffic to test the new custom span.
+- **Result:** A span is created for the `/custom` route and sent to the Collector.
+
+---
+
+### **9. Verify Traces**
+Check the OpenTelemetry Collector logs to confirm that the custom span is being collected:
+```bash
+INFO    TracesExporter  {"kind": "exporter", "data_type": "traces", "resource spans": 1, "spans": 1}
+```
+
+---
 
 ## Conclusion:
 
