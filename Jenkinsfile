@@ -56,10 +56,8 @@ pipeline {
         // Terraform Apply
         stage('Terraform Apply') {
             steps {
-                input {
-                    message "Review the Terraform Plan and approve deployment."
-                }
                 script {
+                    message "Review the Terraform Plan and approve deployment."
                     dir('terraform') {
                         sh '''
                         echo "Applying Terraform changes..."
