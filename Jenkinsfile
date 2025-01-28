@@ -107,32 +107,32 @@ pipeline {
                 }
             }
         }
-
         // Docker Build, Scan & Push
         stage('Docker Build, Scan & Push') {
             steps {
                 script {
-                    sh '''
-                    echo "Fetching Docker credentials from Vault..."
-                    export VAULT_ADDR=${VAULT_ADDR}
-                    export VAULT_TOKEN=${VAULT_TOKEN}
+                    dir('src') {
+                        sh '''
+                        echo "Fetching Docker credentials from Vault..."
+                        export VAULT_ADDR=${VAULT_ADDR}
+                        export VAULT_TOKEN=${VAULT_TOKEN}
 
-                    # Fetch credentials from Vault
-                    export DOCKER_USERNAME=$(vault kv get -field=username secret/docker)
-                    export DOCKER_PASSWORD=$(vault kv get -field=password secret/docker)
+                        # Fetch credentials from Vault
+                        export DOCKER_USERNAME=$(vault kv get -field=username secret/docker)
+                        export DOCKER_PASSWORD=$(vault kv get -field=password secret/docker)
 
-                    echo "Building Docker image..."
-                    docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest .
+                        echo "Building Docker image..."
+                        docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest .
 
-                    echo "Scanning Docker image with Trivy..."
-                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest | tee trivy-report.txt
+                        echo "Scanning Docker image with Trivy..."
+                        trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest | tee trivy-report.txt
 
-                    echo "Logging in to Docker Hub..."
-                    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+                        echo "Logging in to Docker Hub..."
+                        echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
-                    echo "Pushing Docker image to Docker Hub..."
-                    docker push $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest
-                    '''
+                        echo "Pushing Docker image to Docker Hub..."
+                        docker push $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest
+                    }    '''
                 }
             }
         }
