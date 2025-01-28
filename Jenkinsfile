@@ -147,6 +147,9 @@ pipeline {
             steps {
                 dir('Prometheus') {
                     sh '''
+                    echo "Removing existing Prometheus container if it exists..."
+                    docker rm -f prometheus || echo "No existing Prometheus container to remove."
+                    
                     echo "Deploying Prometheus for monitoring..."
                     docker run -d \
                         --name prometheus \
