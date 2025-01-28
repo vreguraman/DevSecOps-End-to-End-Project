@@ -13,7 +13,7 @@ const resource = new Resource({
   'service.name': 'devsecops-app', // Service name for traces
 });
 const traceExporter = new OTLPTraceExporter({
-  url: 'http://<collector-ip>:4318/v1/traces', // Replace <collector-ip> with your OpenTelemetry Collector IP
+  url: 'http://15.207.71.232:4318/v1/traces', // Replace <collector-ip> with your OpenTelemetry Collector IP
 });
 const tracerProvider = new NodeTracerProvider({ resource });
 tracerProvider.addSpanProcessor(new SimpleSpanProcessor(traceExporter));
