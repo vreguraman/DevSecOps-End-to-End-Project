@@ -71,9 +71,12 @@ pipeline {
         // Run Node.js Tests
         stage('Run Tests') {
             steps {
-                echo "Running npm tests and creating application artifact..."
+                echo "Cleaning workspace and installing dependencies..."
                 dir('src') {
                     sh '''
+                        echo "Cleaning up existing node_modules..."
+                        rm -rf node_modules package-lock.json
+
                         echo "Installing dependencies..."
                         npm install
 
