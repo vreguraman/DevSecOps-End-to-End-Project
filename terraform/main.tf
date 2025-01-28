@@ -51,7 +51,7 @@ resource "aws_instance" "Sample-Ecommerce-Instance" {
   instance_type = "t2.micro"              # Free-tier eligible instance type
   key_name   = "Devsecops"           # SSH key pair name
 
-  vpc_security_group_ids = [aws_security_group.example_sg.id] # Attach the security group
+
 
   root_block_device {
     encrypted = true # Encrypt the root block device
