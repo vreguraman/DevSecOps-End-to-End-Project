@@ -143,34 +143,18 @@ pipeline {
             }
         }
 
-        stage('Snyk Security Scan') {
-            steps {
-                sh '''
-                echo "Fetching Snyk token from Vault..."
-                export VAULT_ADDR="${VAULT_ADDR}"
-                export VAULT_TOKEN="${VAULT_TOKEN}"
-
-                SNYK_TOKEN=$(vault kv get -field=api_token snyk/token) || { echo "Failed to fetch Snyk token"; exit 1; }
-
-                echo "Authenticating Snyk CLI with fetched token..."
-                snyk auth $SNYK_TOKEN || { echo "Snyk authentication failed"; exit 1; }
-
-                echo "Running Snyk Security Scan..."
-                snyk test | tee snyk-report.txt || echo "Snyk scan completed with vulnerabilities."
-                '''
-            }
-        }
-
         stage('Deploy Prometheus') {
             steps {
-                sh '''
-                echo "Deploying Prometheus for monitoring..."
-                docker run -d \
-                    --name prometheus \
-                    -p 9090:9090 \
-                    -v /path/to/prometheus.yml:/etc/prometheus/prometheus.yml \
-                    prom/prometheus || { echo "Failed to deploy Prometheus"; exit 1; }
-                '''
+                dir('Prometheus') {
+                    sh '''
+                    echo "Deploying Prometheus for monitoring..."
+                    docker run -d \
+                        --name prometheus \
+                        -p 9090:9090 \
+                        -v $(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml \
+                        prom/prometheus || { echo "Failed to deploy Prometheus"; exit 1; }
+                    '''
+                }
             }
         }
 
