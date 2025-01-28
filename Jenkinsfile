@@ -62,7 +62,7 @@ pipeline {
                     dir('terraform') {
                         sh '''
                         echo "Applying Terraform changes..."
-                        terraform apply -auto-approve \
+                        terraform apply tfplan \
                             -var="aws_access_key=$(cat ../access_key.txt)" \
                             -var="aws_secret_key=$(cat ../secret_key.txt)"
                         '''
