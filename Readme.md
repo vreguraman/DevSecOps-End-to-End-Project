@@ -23,6 +23,11 @@ This **DevSecOps project** demonstrates the implementation of a secure and autom
 
 **Team Collaboration:** Streamline notifications and updates through Slack integrations.
 
+
+---
+![](/Images/Devsecops.png)
+---
+
 ## Create Jenkins Server
 
 ### Create an EC2 Instance:
