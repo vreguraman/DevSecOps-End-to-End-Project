@@ -80,6 +80,14 @@ app.get('/custom', (req, res) => {
   span.end();
 });
 
+// New additional route for handling errors
+app.get('/error', (req, res) => {
+  const span = tracer.startSpan('Error Route Span');
+  span.addEvent('Simulating error route');
+  res.status(500).json({ error: 'Simulated error occurred!' });
+  span.end();
+});
+
 // Start the server
 if (require.main === module) {
   app.listen(port, () => {
