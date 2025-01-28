@@ -78,7 +78,7 @@ pipeline {
                         rm -rf node_modules package-lock.json
 
                         echo "Installing dependencies..."
-                        npm ci
+                        npm install
 
                         echo "Running tests..."
                         npm test
