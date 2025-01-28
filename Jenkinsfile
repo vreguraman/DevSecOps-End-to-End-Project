@@ -149,12 +149,12 @@ pipeline {
                     sh '''
                     echo "Removing existing Prometheus container if it exists..."
                     docker rm -f prometheus || echo "No existing Prometheus container to remove."
-                    
+
                     echo "Deploying Prometheus for monitoring..."
                     docker run -d \
                         --name prometheus \
                         -p 9090:9090 \
-                        -v $(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml \
+                        -v $(pwd)/prometheus.yaml:/etc/prometheus/prometheus.yaml \
                         prom/prometheus || { echo "Failed to deploy Prometheus"; exit 1; }
                     '''
                 }
