@@ -98,10 +98,10 @@ pipeline {
                         sh '''
                         echo "Running SonarQube Analysis..."
                         sonar-scanner \
-                            -Dsonar.projectKey=Sample-Ecommerce-Project \
+                            -Dsonar.projectKey=Project \
                             -Dsonar.sources=src \
-                            -Dsonar.host.url=http://3.91.226.9:9000/ \
-                            -Dsonar.login=sqa_c89317d4b88fd2b1fa3a4c3f09e57cb0e67226d0 | tee sonar-report.txt
+                            -Dsonar.host.url=http://15.207.71.232:9000/ \
+                            -Dsonar.login=sqa_ab787d1d52b8021ed2c47dc7681c5f17829195e1 | tee sonar-report.txt
                         '''
                     }
                 }
