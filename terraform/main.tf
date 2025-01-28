@@ -13,7 +13,7 @@ provider "aws" {
 
 
 
-resource "aws_security_group" "example_sg" {
+resource "aws_security_group" "Sample-Ecommerce-Instance-SG" {
   name        = "Sample-Ecommerce-Instance-SG"
   description = "Allow restricted SSH and HTTP traffic"
 

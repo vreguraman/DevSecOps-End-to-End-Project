@@ -62,7 +62,7 @@ pipeline {
                     dir('terraform') {
                         sh '''
                         echo "Applying Terraform changes..."
-                        terraform apply tfplan
+                        terraform apply -auto-approve tfplan
                         '''
                     }
                 }
