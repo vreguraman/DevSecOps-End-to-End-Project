@@ -160,28 +160,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Send Reports to Developers') {
-            steps {
-                sh '''
-                echo "Consolidating reports..."
-                echo "SonarQube Analysis Results:" > email-body.txt
-                cat sonar-report.txt >> email-body.txt
-
-                echo "\nTerraform Security Scan Results:" >> email-body.txt
-                cat tfscan-report.txt >> email-body.txt
-
-                echo "\nTrivy Docker Image Scan Results:" >> email-body.txt
-                cat trivy-report.txt >> email-body.txt
-
-                echo "\nSnyk Vulnerabilities Report:" >> email-body.txt
-                cat snyk-report.txt >> email-body.txt
-
-                echo "Emailing reports to developers..."
-                mail -s "Security Scan Reports from CI/CD Pipeline" panny.gatla@gmail.com < email-body.txt || { echo "Failed to send email"; exit 1; }
-                '''
-            }
-        }
     }
     post {
         always {
