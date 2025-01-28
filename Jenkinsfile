@@ -45,6 +45,7 @@ pipeline {
 
                         echo "Planning Terraform changes..."
                         terraform plan \
+                            -out=tfplan \
                             -var="aws_access_key=$(cat ../access_key.txt)" \
                             -var="aws_secret_key=$(cat ../secret_key.txt)" | tee terraform-plan.txt
                         '''
