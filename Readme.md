@@ -25,7 +25,7 @@ This **DevSecOps project** demonstrates the implementation of a secure and autom
 
 
 ---
-![](/Images/Devsecops.png)
+![](/Images/Devsecops%20(2).png)
 ---
 
 ## Create Jenkins Server
