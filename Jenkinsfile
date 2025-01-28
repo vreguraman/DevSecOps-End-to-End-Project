@@ -58,13 +58,11 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 script {
-                    message "Review the Terraform Plan and approve deployment."
+                    input message: "Review the Terraform Plan and approve deployment.", ok: "Proceed"
                     dir('terraform') {
                         sh '''
                         echo "Applying Terraform changes..."
-                        terraform apply tfplan \
-                            -var="aws_access_key=$(cat ../access_key.txt)" \
-                            -var="aws_secret_key=$(cat ../secret_key.txt)"
+                        terraform apply tfplan
                         '''
                     }
                 }
@@ -191,11 +189,12 @@ pipeline {
                 }
             }
         }
+
+        // Deploy Prometheus
         stage('Deploy Prometheus') {
             steps {
                 script {
                     echo "Deploying Prometheus for monitoring..."
-                    // Use Docker Compose or Terraform to deploy Prometheus
                     sh '''
                     docker run -d \
                         --name prometheus \
