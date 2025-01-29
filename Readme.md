@@ -1241,7 +1241,9 @@ Access the metrics at:
 ```bash
 http://your-public-ip:8888/metrics
 ```
+---
 ![](/Images/otel-metrics.jpg)
+
 ---
 
 ### 8. Enhance Tracing in the Application (*This step is already included in server.js*)

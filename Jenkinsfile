@@ -161,12 +161,12 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            sh 'rm -f aws_creds.json access_key.txt secret_key.txt tfscan-report.txt terraform-plan.txt trivy-report.txt snyk-report.txt sonar-report.txt email-body.txt'
-        }
-        failure {
-            echo "Pipeline failed. Check logs for details."
-        }
-    }
+    // post {
+    //     always {
+    //         sh 'rm -f aws_creds.json access_key.txt secret_key.txt tfscan-report.txt terraform-plan.txt trivy-report.txt snyk-report.txt sonar-report.txt email-body.txt'
+    //     }
+    //     failure {
+    //         echo "Pipeline failed. Check logs for details."
+    //     }
+    // }
 }
