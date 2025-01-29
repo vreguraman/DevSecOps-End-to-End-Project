@@ -6,6 +6,7 @@ pipeline {
         PATH = "/opt/sonar-scanner/bin:$PATH" // Adding Sonar Scanner to PATH
     }
     stages {
+        // Test Vault Connection
         stage('Test Vault') {
             steps {
                 sh '''
@@ -20,17 +21,23 @@ pipeline {
             }
         }
 
+        // Terraform Security Scan (TFScan)
         stage('TFScan') {
             steps {
                 dir('terraform') {
                     sh '''
                     echo "Running TFScan..."
-                    tfsec . | tee tfscan-report.txt  ||  echo "TFScan completed with warnings."
+                    tfsec . | tee tfscan-report.txt || echo "TFScan completed with warnings."
+
+                    echo "Verifying TFScan report..."
+                    ls -l tfscan-report.txt || { echo "TFScan report not found"; exit 1; }
                     '''
                 }
+                archiveArtifacts artifacts: 'terraform/tfscan-report.txt', allowEmptyArchive: true
             }
         }
 
+        // Terraform Plan
         stage('Terraform Plan') {
             steps {
                 dir('terraform') {
@@ -48,6 +55,7 @@ pipeline {
             }
         }
 
+        // Terraform Apply
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
@@ -59,6 +67,7 @@ pipeline {
             }
         }
 
+        // Run Node.js Tests
         stage('Run Node.js Tests') {
             steps {
                 dir('src') {
@@ -79,6 +88,7 @@ pipeline {
             }
         }
 
+        // SonarQube Analysis
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
@@ -88,12 +98,13 @@ pipeline {
                         -Dsonar.projectKey=Project \
                         -Dsonar.sources=src \
                         -Dsonar.host.url=http://65.2.74.101:9000/ \
-                        -Dsonar.login=sqa_ab787d1d52b8021ed2c47dc7681c5f17829195e1 || tee sonar-report.txt || { echo "SonarQube analysis failed"; exit 1; }
+                        -Dsonar.login=sqa_ab787d1d52b8021ed2c47dc7681c5f17829195e1 || { echo "SonarQube analysis failed"; exit 1; }
                     '''
                 }
             }
         }
 
+        // Docker Build, Scan & Push
         stage('Docker Build, Scan & Push') {
             steps {
                 dir('src') {
@@ -109,7 +120,10 @@ pipeline {
                     docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest . || { echo "Docker build failed"; exit 1; }
 
                     echo "Scanning Docker image with Trivy..."
-                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest | tee trivy-report.txt || { echo "Trivy scan completed with warnings."; }
+                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest | tee trivy-report.txt || echo "Trivy scan completed with warnings."
+
+                    echo "Verifying Trivy report..."
+                    ls -l trivy-report.txt || { echo "Trivy report not found"; exit 1; }
 
                     echo "Logging in to Docker Hub..."
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin || { echo "Docker login failed"; exit 1; }
@@ -118,9 +132,11 @@ pipeline {
                     docker push $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest || { echo "Docker push failed"; exit 1; }
                     '''
                 }
+                archiveArtifacts artifacts: 'src/trivy-report.txt', allowEmptyArchive: true
             }
         }
 
+        // Nexus Integration
         stage('Nexus Integration') {
             steps {
                 sh '''
@@ -143,6 +159,7 @@ pipeline {
             }
         }
 
+        // Deploy Prometheus
         stage('Deploy Prometheus') {
             steps {
                 dir('Prometheus') {
@@ -161,12 +178,4 @@ pipeline {
             }
         }
     }
-    // post {
-    //     always {
-    //         sh 'rm -f aws_creds.json access_key.txt secret_key.txt tfscan-report.txt terraform-plan.txt trivy-report.txt snyk-report.txt sonar-report.txt email-body.txt'
-    //     }
-    //     failure {
-    //         echo "Pipeline failed. Check logs for details."
-    //     }
-    // }
 }
