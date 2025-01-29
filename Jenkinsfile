@@ -144,15 +144,21 @@ pipeline {
             steps {
                 dir('terraform') {
                     sh '''
-                    echo "Running TFSec..."
-                    tfsec . --format json > tfsec-results.json || { echo "TFSec scan failed"; exit 1; }
+            echo "Running TFSec..."
+            if ! tfsec . --format json > tfsec-results.json; then
+                echo "TFSec scan failed. Check if Terraform files are valid and present."
+                exit 1
+            fi
 
-                    echo "Generating TFSec Prometheus Metrics..."
-                    node ../src/generate-tfsec-metrics.js || { echo "Failed to generate TFSec metrics"; exit 1; }
+            echo "Verifying TFSec results..."
+            ls -l tfsec-results.json || { echo "TFSec results file not found"; exit 1; }
 
-                    echo "Renaming TFSec metrics file for Prometheus..."
-                    mv tfsec-metrics.prom metrics || { echo "Failed to move TFSec metrics file"; exit 1; }
-                    '''
+            echo "Generating TFSec Prometheus Metrics..."
+            node ../src/generate-tfsec-metrics.js || { echo "Failed to generate TFSec metrics"; exit 1; }
+
+            echo "Renaming TFSec metrics file for Prometheus..."
+            mv tfsec-metrics.prom metrics || { echo "Failed to move TFSec metrics file"; exit 1; }
+            '''
                 }
                 archiveArtifacts artifacts: 'terraform/metrics', allowEmptyArchive: true
             }
