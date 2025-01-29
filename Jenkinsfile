@@ -87,7 +87,7 @@ pipeline {
                     sonar-scanner \
                         -Dsonar.projectKey=Project \
                         -Dsonar.sources=src \
-                        -Dsonar.host.url=http://15.207.71.232:9000/ \
+                        -Dsonar.host.url=http://65.2.74.101:9000/ \
                         -Dsonar.login=sqa_ab787d1d52b8021ed2c47dc7681c5f17829195e1 || tee sonar-report.txt || { echo "SonarQube analysis failed"; exit 1; }
                     '''
                 }

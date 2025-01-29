@@ -45,11 +45,11 @@ This **DevSecOps project** demonstrates the implementation of a secure and autom
 ### Commands to Run After Launch:
 
 ```bash
-# Update the instance
+
 sudo yum update -y
 ```
 ```bash
-# Install basic utilities
+
 sudo yum install -y wget git
 ```
 
