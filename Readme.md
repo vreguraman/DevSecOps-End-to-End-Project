@@ -1210,6 +1210,8 @@ sudo mv otelcol-contrib /usr/local/bin/otelcol
 ```bash
 otelcol --version
 ```
+
+![](/Images/otel-version.jpg)
 - **Why:** Confirms that the Collector is installed correctly.
 - **Result:** Displays the version of the Collector.
 
@@ -1220,6 +1222,8 @@ Ensure the `otel-collector-config.yaml` file is present in your directory. Run t
 ```bash
 otelcol --config otel-collector-config.yaml
 ```
+
+![](/Images/otel-success.jpg)
 - **Why:** Starts the Collector with the specified configuration.
   - Receives traces from your application.
   - Processes and exports traces to the desired backend (e.g., logging, Jaeger).
@@ -1262,6 +1266,11 @@ Visit the custom route in your browser or using `curl`:
 ```bash
 http://<your-server-ip>:3000/custom
 ```
+---
+
+![](/Images/otel-custom-metrics.jpg)
+
+---
 - **Why:** Generates traffic to test the new custom span.
 - **Result:** A span is created for the `/custom` route and sent to the Collector.
 
