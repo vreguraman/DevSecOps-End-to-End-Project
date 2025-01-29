@@ -884,12 +884,7 @@ vault secrets enable -path=nexus kv
 
 
 #### 2. Store Nexus Credentials
-Use the `vault kv put` command to securely store your Nexus credentials:
-```bash
-vault kv put nexus/credentials username="your-nexus-username" password="your-nexus-password"
-```
-
-You can also include additional details, such as the Nexus repository URL or token:
+Use the `vault kv put` command to securely store your Nexus credentials and repository URL or token:
 ```bash
 vault kv put nexus/credentials \
     username="your-nexus-username" \
