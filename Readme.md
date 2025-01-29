@@ -1230,10 +1230,18 @@ otelcol --config otel-collector-config.yaml
 - **Result:** The Collector is running and ready to process telemetry data.
 
 Check the Collector logs to confirm traces are being received:
-```bash
+```
 INFO    TracesExporter  {"kind": "exporter", "data_type": "traces", "resource spans": 1, "spans": 1}
 ```
+### Metrics Endpoint
 
+The OpenTelemetry Collector exposes its internal metrics at the /metrics endpoint. These metrics are in Prometheus format and provide insights into the Collector's performance and health.
+
+Access the metrics at:
+```bash
+http://your-public-ip:8888/metrics
+```
+![](/Images/otel-metrics.jpg)
 ---
 
 ### 8. Enhance Tracing in the Application (*This step is already included in server.js*)
