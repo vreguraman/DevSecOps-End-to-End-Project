@@ -120,10 +120,13 @@ pipeline {
                     docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest . || { echo "Docker build failed"; exit 1; }
 
                     echo "Scanning Docker image with Trivy..."
-                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest | tee trivy-report.txt || echo "Trivy scan completed with warnings."
+                    trivy image --format json --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest > trivy-results.json || echo "Trivy scan completed with warnings."
 
-                    echo "Verifying Trivy report..."
-                    ls -l trivy-report.txt || { echo "Trivy report not found"; exit 1; }
+                    echo "Generating Trivy Prometheus Metrics..."
+                    node generate-trivy-metrics.js || { echo "Failed to generate Trivy metrics"; exit 1; }
+
+                    echo "Renaming Trivy metrics file for Prometheus..."
+                    mv trivy-metrics.prom metrics || { echo "Failed to move Trivy metrics file"; exit 1; }
 
                     echo "Logging in to Docker Hub..."
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin || { echo "Docker login failed"; exit 1; }
@@ -132,49 +135,82 @@ pipeline {
                     docker push $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest || { echo "Docker push failed"; exit 1; }
                     '''
                 }
-                archiveArtifacts artifacts: 'src/trivy-report.txt', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'src/metrics', allowEmptyArchive: true
             }
         }
 
-        // Nexus Integration
-        stage('Nexus Integration') {
+        // Generate TFSec Prometheus Metrics
+        stage('Generate TFSec Metrics') {
             steps {
-                sh '''
-                echo "Fetching Nexus credentials from Vault..."
-                export VAULT_ADDR="${VAULT_ADDR}"
-                export VAULT_TOKEN="${VAULT_TOKEN}"
+                dir('terraform') {
+                    sh '''
+                    echo "Running TFSec..."
+                    tfsec . --format json > tfsec-results.json || { echo "TFSec scan failed"; exit 1; }
 
-                NEXUS_USERNAME=$(vault kv get -field=username nexus/credentials) || { echo "Failed to fetch Nexus username"; exit 1; }
-                NEXUS_PASSWORD=$(vault kv get -field=password nexus/credentials) || { echo "Failed to fetch Nexus password"; exit 1; }
-                NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials) || { echo "Failed to fetch Nexus repo URL"; exit 1; }
+                    echo "Generating TFSec Prometheus Metrics..."
+                    node ../src/generate-tfsec-metrics.js || { echo "Failed to generate TFSec metrics"; exit 1; }
 
-                echo "Uploading Node.js application archive to Nexus..."
-                ARTIFACT=src/app.tar.gz
-                tar -czf $ARTIFACT src/ || { echo "Failed to create artifact"; exit 1; }
-
-                curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD \
-                    --upload-file $ARTIFACT \
-                    $NEXUS_REPO_URL/repository/nodejs-app/ || { echo "Failed to upload artifact to Nexus"; exit 1; }
-                '''
+                    echo "Renaming TFSec metrics file for Prometheus..."
+                    mv tfsec-metrics.prom metrics || { echo "Failed to move TFSec metrics file"; exit 1; }
+                    '''
+                }
+                archiveArtifacts artifacts: 'terraform/metrics', allowEmptyArchive: true
             }
         }
 
-        // Deploy Prometheus
-        stage('Deploy Prometheus') {
+        // Deploy Trivy Metrics Exporter
+        stage('Deploy Trivy Metrics Exporter') {
+            steps {
+                dir('src') {
+                    sh '''
+                    echo "Starting HTTP server for Trivy metrics..."
+                    nohup python3 -m http.server 8085 &
+                    '''
+                }
+            }
+        }
+
+        // Deploy TFSec Metrics Exporter
+        stage('Deploy TFSec Metrics Exporter') {
+            steps {
+                dir('terraform') {
+                    sh '''
+                    echo "Starting HTTP server for TFSec metrics..."
+                    nohup python3 -m http.server 8086 &
+                    '''
+                }
+            }
+        }
+
+        // Update Prometheus Configuration
+        stage('Update Prometheus Configuration') {
             steps {
                 dir('Prometheus') {
                     sh '''
-                    echo "Removing existing Prometheus container if it exists..."
-                    docker rm -f prometheus || echo "No existing Prometheus container to remove."
+                    echo "Adding Trivy and TFSec targets to Prometheus configuration..."
+                    cat >> prometheus.yaml <<EOL
 
-                    echo "Deploying Prometheus for monitoring..."
-                    docker run -d \
-                        --name prometheus \
-                        -p 9090:9090 \
-                        -v $(pwd)/prometheus.yaml:/etc/prometheus/prometheus.yaml \
-                        prom/prometheus || { echo "Failed to deploy Prometheus"; exit 1; }
+  - job_name: 'trivy-metrics'
+    static_configs:
+      - targets: ['localhost:8085']
+
+  - job_name: 'tfsec-metrics'
+    static_configs:
+      - targets: ['localhost:8086']
+
+EOL
                     '''
                 }
+            }
+        }
+
+        // Reload Prometheus
+        stage('Reload Prometheus') {
+            steps {
+                sh '''
+                echo "Reloading Prometheus to apply new configuration..."
+                docker exec prometheus kill -HUP 1 || { echo "Failed to reload Prometheus"; exit 1; }
+                '''
             }
         }
     }
