@@ -1,5 +1,17 @@
 # End-to-End DevSecOps Implementation with Monitoring and Scanning
 
+
+
+## Table of Content:
+
+[Project Overview](#Project-Overview)
+[Key Objectives](#Key-Objectives)
+[Architecture](#Architecture)
+[Create Jenkins Server](#Create-Jenkins-Server)
+[Install OpenTelemetry and Project Dependencies](#Install-OpenTelemetry-and-Project-Dependencies)
+
+
+
 ### Project Overview
 This **DevSecOps project** demonstrates the implementation of a secure and automated CI/CD pipeline using industry-leading tools. It combines automation, security, and observability practices to streamline application delivery while maintaining robust security standards.
 
@@ -23,14 +35,14 @@ This **DevSecOps project** demonstrates the implementation of a secure and autom
 
 **Team Collaboration:** Streamline notifications and updates through Slack integrations.
 
-
+## Architecture
 ---
 ![](/Images/Devsecops.png)
 ---
 
 ## Create Jenkins Server
 
-### Create an EC2 Instance:
+### Creating an EC2 Instance:
 
 1. Log in to the AWS Management Console.
 2. Navigate to **EC2 > Instances > Launch Instances**.
@@ -197,12 +209,12 @@ sudo systemctl status jenkins
 ### Access Jenkins
 
 Once you access Jenkins at `http://<Jenkins-Instance-IP>:8080`, you will see the following page:
-
+"
 ![](/Images/Jenkins/Jenkins-access.jpg)
 
 ---
 
-### Retrieve the Initial Admin Password
+### Retrieving the Initial Admin Password
 Copy the file path shown on the page and run the following command in the terminal:
 ```bash
 cat /var/lib/jenkins/secrets/initialAdminPassword
@@ -216,7 +228,7 @@ After entering the initial admin password, you will be redirected to a page to s
 
 Provide the necessary details to create your Jenkins account, then  select **Install the suggested plugins** and login to your account.
 
-### Configure Jenkins for CI/CD with Additional Tools
+### Configuring Jenkins for CI/CD with Additional Tools
 
 #### 1. Install Essential Plugins
 
@@ -341,7 +353,7 @@ npm install -g snyk
 snyk --version
 ```
 
-### Configure Global Tools in Jenkins
+### Configuring Global Tools in Jenkins
 
 1. **Git**:
    - Go to **Manage Jenkins > Global Tool Configuration**.
@@ -426,7 +438,7 @@ docker run -d --name sonarcontainer -p 9000:9000 sonarqube:latest
 
 ---
 
-#### Add SonarQube Configuration to Jenkins
+#### Adding SonarQube Configuration to Jenkins
 1. Go to **Manage Jenkins > Configure System**.
 2. Scroll to **SonarQube Servers** and click **Add SonarQube**.
 3. Enter the following details:
@@ -921,7 +933,7 @@ vault kv put secret/docker username="<user-name>" password="<your-password>"
 
 ---
 
-### Store Snyk Token
+### Storing Snyk Token
 
 ### 1. Sign In to Snyk
 - Go to the [Snyk login page](https://snyk.io/).
