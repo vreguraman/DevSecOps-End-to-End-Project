@@ -14,6 +14,20 @@
 
 [Install OpenTelemetry and Project Dependencies](#Install-OpenTelemetry-and-Project-Dependencies)
 
+[Jenkins Installation](#Jenkins-Installation)
+
+- [Configuring Jenkins for CI/CD with Additional Tools](#Configuring-Jenkins-for-CI/CD-with-Additional-Tools)
+
+- [Troubleshooting Updating Jenkins IP Address](#Troubleshooting-Updating-Jenkins-IP-Address)
+
+[Configure Tools](#Configure-Tools)
+
+- [Install Terraform](#Install-Terraform)
+- [Install TFScan](#Install-TFScan)
+- [Install Trivy](#Install-Trivy)
+
+
+
 
 
 ### Project Overview
