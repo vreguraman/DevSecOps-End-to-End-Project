@@ -5,9 +5,13 @@
 ## Table of Content:
 
 [Project Overview](#Project-Overview)
+
 [Key Objectives](#Key-Objectives)
+
 [Architecture](#Architecture)
+
 [Create Jenkins Server](#Create-Jenkins-Server)
+
 [Install OpenTelemetry and Project Dependencies](#Install-OpenTelemetry-and-Project-Dependencies)
 
 
