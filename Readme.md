@@ -1181,6 +1181,168 @@ click on **import.**
 ![](/Images/Grafana-App-Dashboard.jpg)
 
 ---
+
+## Bringing Visibility to Trivy & TFsec: Security Insights with Prometheus & Grafana
+
+Trivy and TFsec are powerful security scanning tools for containers and Infrastructure as Code (IaC), but they lack a built-in graphical interface for visualizing vulnerabilities. This project bridges that gap by integrating Trivy and TFsec with Prometheus and Grafana, transforming raw security scan data into insightful, real-time dashboards for better monitoring and decision-making. 🚀
+
+## Trivy Integration
+
+### Scan Docker Image with Trivy
+```sh
+trivy image --format json --severity HIGH,CRITICAL <image-name> > trivy-results.json
+```
+
+After running this command, a `trivy-results.json` file will be created.
+
+###  Generate Prometheus Metrics from Trivy Results
+Create a file `generate-trivy-metrics.js` and add the following content:
+
+```bash
+vi generate-trivy-metrics.js
+```
+```javascript
+const fs = require('fs');
+
+try {
+    console.log('Reading Trivy results...');
+    const trivyResults = JSON.parse(fs.readFileSync('trivy-results.json', 'utf8'));
+
+    console.log('Generating Prometheus metrics...');
+    const metrics = [];
+    trivyResults.Results.forEach((result) => {
+        result.Vulnerabilities.forEach((vuln) => {
+            metrics.push(`# HELP trivy_vulnerabilities Trivy vulnerability scan results`);
+            metrics.push(`# TYPE trivy_vulnerabilities gauge`);
+            metrics.push(`trivy_vulnerabilities{image="${result.Target}",severity="${vuln.Severity}",id="${vuln.VulnerabilityID}"} 1`);
+        });
+    });
+
+    console.log('Writing metrics to trivy-metrics.prom...');
+    fs.writeFileSync('trivy-metrics.prom', metrics.join('\n'));
+    console.log('Metrics file trivy-metrics.prom created successfully.');
+} catch (error) {
+    console.error('Error:', error.message);
+}
+```
+Run the script:
+```sh
+node generate-trivy-metrics.js
+```
+A `trivy-metrics.prom` file will be created.
+
+Move the file to the `metrics` directory:
+```sh
+mv trivy-metrics.prom metrics
+```
+
+Start a simple HTTP server to expose metrics on **port 8085**:
+```sh
+python3 -m http.server 8085
+```
+
+### Add Trivy to Prometheus Configuration
+Edit `prometheus.yaml`:
+```yaml
+scrape_configs:
+  - job_name: "trivy"
+    static_configs:
+      - targets: ["<your-server-ip>:8085"]
+```
+Reload Prometheus to apply changes.
+
+### Visualize Trivy Metrics in Grafana
+1. Open Grafana (`http://<your-server-ip>:3000`)
+2. Navigate to **Configuration → Data Sources**
+3. Add **Prometheus** as a data source with URL `http://localhost:9090`
+4. Create a new dashboard:
+   - Add a new panel
+   - Use PromQL query:
+     ```
+     trivy_vulnerabilities
+     ```
+   - Choose a visualization type (Table, Gauge, Time Series, etc.)
+   - Save the dashboard
+---
+
+## TFsec Integration
+
+###  Run TFsec and Generate JSON Output
+```sh
+cd /root/DevSecOps-End-to-End-Project/terraform
+tfsec . --format=json > tfsec-results.json
+```
+
+###  Generate Prometheus Metrics from TFsec Results
+Create a file `generate-tfsec-metrics.js` and add the following content:
+
+```bash
+vi generate-tfsec-metrics.js
+```
+
+```javascript
+const fs = require('fs');
+
+console.log("Reading TFsec results...");
+const tfsecResults = JSON.parse(fs.readFileSync('tfsec-results.json', 'utf8'));
+
+console.log("Generating Prometheus metrics...");
+let metrics = "# HELP tfsec_vulnerabilities TFsec vulnerability scan results\n";
+metrics += "# TYPE tfsec_vulnerabilities gauge\n";
+
+tfsecResults.results.forEach(result => {
+    metrics += `tfsec_vulnerabilities{severity="${result.severity}",rule_id="${result.rule_id}",description="${result.description.replace(/"/g, '\\"')}"} 1\n`;
+});
+
+console.log("Writing metrics to tfsec-metrics.prom...");
+fs.writeFileSync('tfsec-metrics.prom', metrics);
+
+console.log("Metrics file tfsec-metrics.prom created successfully.");
+```
+Run the script:
+```sh
+node generate-tfsec-metrics.js
+```
+A `tfsec-metrics.prom` file will be created.
+
+Move the file to the `metrics` directory:
+```sh
+mv tfsec-metrics.prom metrics
+```
+
+Start a simple HTTP server to expose metrics  on **port 8086**:
+```sh
+python3 -m http.server 8086
+```
+
+### Add TFsec to Prometheus Configuration
+Edit `prometheus.yaml`:
+```yaml
+scrape_configs:
+  - job_name: "tfsec"
+    static_configs:
+      - targets: ["<your-server-ip>:8086"]
+```
+Reload Prometheus to apply changes.
+
+### Step 4: Visualize TFsec Metrics in Grafana
+1. Open Grafana (`http://<your-server-ip>:3000`)
+2. Navigate to **Configuration → Data Sources**
+3. Add **Prometheus** as a data source with URL `http://localhost:9090`
+4. Create a new dashboard:
+   - Add a new panel
+   - Use PromQL query:
+     ```
+     tfsec_vulnerabilities
+     ```
+   - Choose a visualization type (Table, Gauge, Time Series, etc.)
+   - Save the dashboard
+
+Now, you can monitor security vulnerabilities detected by Trivy and TFsec in Grafana!
+
+----
+
+
 ## OpenTelemetry Setup and Configuration
 Since we have already installed the OpenTelemetry-related dependencies and updated the `collectorUrl` in `server.js` earlier, let's proceed with downloading the OpenTelemetry Collector.
 
