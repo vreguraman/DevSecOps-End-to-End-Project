@@ -81,7 +81,7 @@ sudo yum update -y
 ```
 ```bash
 
-sudo yum install -y wget git
+sudo yum install git -y
 ```
 
 ## Install OpenTelemetry and Project Dependencies
@@ -166,21 +166,21 @@ Configure the application to send trace data to the OpenTelemetry Collector.
 Run the application to generate and send telemetry data to the OpenTelemetry Collector.
 
 #### Steps:
-1. Start the server:
+1. Executing node server.js in Background
    ```bash
-   node server.js
+   node server.js &
    ```
 
 2. Access the application at:
    ```
    http://<public-ip>:3000
    ```
-
+### Application Successfully Running on Port 3000
 ---
 ![](/Images/1.NodeJs.jpg)
 ---
 
-3. To stop the server:
+3. To stop the server: (if you run without &)(optional)
    ```bash
    Ctrl + C
    ```
@@ -207,6 +207,12 @@ sudo yum install -y java-17-amazon-corretto
 java --version
 ```
 
+### Command Line Execution Result
+---
+![](/Images/java-version.jpg)
+
+---
+
 3. Install Jenkins:
 
 ```bash
@@ -224,6 +230,11 @@ sudo systemctl start jenkins
 ```bash
 sudo systemctl status jenkins
 ```
+### Terminal Display of Running Commands
+---
+![](/Images/Jenkins-status.jpg)
+
+---
 
 ### Access Jenkins
 
