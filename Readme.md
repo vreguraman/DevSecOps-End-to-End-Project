@@ -827,7 +827,7 @@ Enter the **Root token** to login.
 1. Right-click on the tab of your terminal session.
 2. From the context menu, select the option **'Duplicate Session'**.
 3. This will open a new tab with a duplicate of your current terminal session, which you can use to continue the setup process.
-4. After entering into the duplicate terminal, get sudo access and follow the steps below.
+4. After entering into the duplicate terminal, get sudo access and follow the steps below..
 
 ---
 
