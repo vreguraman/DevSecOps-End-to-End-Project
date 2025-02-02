@@ -239,19 +239,40 @@ sudo systemctl status jenkins
 ### Access Jenkins
 
 Once you access Jenkins at `http://<Jenkins-Instance-IP>:8080`, you will see the following page:
-"
+
+### Jenkins Server is Up and Running on Port 8080
+---
 ![](/Images/Jenkins/Jenkins-access.jpg)
 
 ---
 
 ### Retrieving the Initial Admin Password
-Copy the file path shown on the page and run the following command in the terminal:
+Run the following command in the terminal:
 ```bash
 cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
-### Create Jenkins User
-After entering the initial admin password, you will be redirected to a page to set up a Jenkins user account. Fill in the required details as shown below:
+### Terminal Output Screenshot
+---
+![](/Images/jennkins-credential.jpg)
 
+---
+Copy the output(initial admin password) and paste in jenkins server to continue
+
+After entering the initial admin password, you will be redirected to a page to install pluggins as shown below:
+
+---
+![](/Images/jenkisn-suggested-pluggins.jpg)
+
+---
+
+ Select **Install suggested plugins** to install necessary plugins
+
+### Create Jenkins User
+After installing plugins, you will be redirected to a page to set up a Jenkins user account. Fill in the required details:
+
+### Here’s the Output You Should See
+
+---
 ![](/Images/Jenkins/Jenkins-create-user.jpg)
 
 ---
