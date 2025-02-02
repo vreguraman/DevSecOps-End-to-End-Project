@@ -256,7 +256,7 @@ cat /var/lib/jenkins/secrets/initialAdminPassword
 ![](/Images/jennkins-credential.jpg)
 
 ---
-Copy the output(initial admin password) and paste in jenkins server to continue
+Copy the output(initial admin password) and paste in **jenkins server** to continue
 
 After entering the initial admin password, you will be redirected to a page to install pluggins as shown below:
 
@@ -283,7 +283,7 @@ After installing plugins, you will be redirected to a page to set up a Jenkins u
 
 ---
 
-Provide the necessary details to create your Jenkins account.
+Provide the necessary details to create your **Jenkins account.**
 
 ### Once the plugins installed you will see jenkins url as shown below:
 
