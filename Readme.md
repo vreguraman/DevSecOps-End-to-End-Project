@@ -646,20 +646,20 @@ Before proceeding, make sure to securely store the following values, as they wil
 - `sonar.projectKey`  
 - `Token`  
 
-#### Create a New Project in SonarQube
+### Create a New Project in SonarQube
 
 1. Log in to SonarQube.
 2. Click **Create a local project** and provide the project name (e.g. `Sample E-Commerce Project`).
 3. Branch should be `main` then `Next`
 4. Select **Use the global setting**, then click **Create Project**.
 
-#### Generate an Authentication Token
+### Generate an Authentication Token
 1. Navigate to **My Account > Security**.
 2. Under **Generate Tokens**, enter a token name (e.g. `Sample Project Token`).
 3. Select **Global Analysis** from the dropdown.
 4. Click **Generate** and copy the token (save it securely; it will not be displayed again).
 
-#### Install Sonar Scanner
+### Install Sonar Scanner
 1. Create a directory for Sonar Scanner:
    ```bash
    mkdir -p /downloads/sonarqube
@@ -691,12 +691,18 @@ Before proceeding, make sure to securely store the following values, as they wil
    ```bash
    source ~/.bashrc
    ```
-1. Verify the installation:
+   Verify the installation:
    ```bash
    sonar-scanner --version
    ```
+### Execution Log in Terminal
+---
+![](/Images/sonarqube-version.jpg)
 
- Ensure “SonarQube Scanner for Jenkins” plugin is installed.
+---
+
+
+ Ensure `SonarQube Scanner` plugin is installed.
 #### Analyze Code with Sonar Scanner
 1. Navigate to the `src` directory.
    ```bash
@@ -713,6 +719,7 @@ Before proceeding, make sure to securely store the following values, as they wil
 
    # Display name of the project
    sonar.projectName=Sample E-Commerce Project 
+
    # Directory where source code is located (relative to this file)
    sonar.sources=.
 
@@ -722,6 +729,9 @@ Before proceeding, make sure to securely store the following values, as they wil
    # Authentication token from SonarQube
    sonar.login=<your-authentication-token>    
    ```
+   **Important**
+   Ensure that you **replace Sonarqube server IP & token** before scanning
+
 3. Run the Sonar Scanner:
    ```bash
    /opt/sonar-scanner/bin/sonar-scanner
@@ -746,7 +756,7 @@ Before proceeding, make sure to securely store the following values, as they wil
    - Make sure you are in the correct path (`/src`).
    - Confirm that the `sonar-project.properties` file exists in the `/src` directory.
 
-#### View Results in SonarQube
+### View Results in SonarQube
 1. Open your browser and navigate to `http://<your-sonarqube-server-ip>:9000`.
 2. Log in to the SonarQube dashboard.
 3. Locate the project (e.g., `Sample E-Commerce Project`).
@@ -760,18 +770,24 @@ Before proceeding, make sure to securely store the following values, as they wil
 
 ---
 
-### HashiCorp Vault Integration
+## Installing HashiCorp Vault for Secure Secrets Management  
 
-In this project, HashiCorp Vault is shared with the Jenkins instance to securely manage AWS credentials and other secrets required by Terraform.
+HashiCorp Vault is used to securely manage AWS credentials and other sensitive secrets, including:  
 
-1. **Open Port for Vault**: Ensure port `8200` is open for Vault communication.
+- **Nexus Credentials**  
+- **Docker Hub Credentials**  
+- **Snyk Token**  
+- **SonarQube Token**  
+- **Other Confidential Secrets**  
 
-2. **Why Vault?**
+By integrating Vault, we ensure that secrets are securely stored and dynamically accessed, reducing security risks.
+
+1. **Why Vault?**
    HashiCorp Vault is used to:
    - Securely store and manage sensitive information.
    - Dynamically generate AWS credentials for Terraform.
 
-3. **Steps for Vault Integration**:
+2. **Steps for Vault Integration**:
    Before proceeding, we need to integrate Vault:
 
    - **Install Vault**:
@@ -790,20 +806,19 @@ In this project, HashiCorp Vault is shared with the Jenkins instance to securely
      vault server -dev -dev-listen-address="0.0.0.0:8200" &
      ```
 
-4. **Access Vault Server**
+3. **Access Vault Server**
 
-To access the Vault server, open your web browser and navigate to:
+      ```bash
+      http://<public-ip>:8200
+      ```
 
-   ```bash
-   http://<public-ip>:8200
-   ```
+ ### Vault is Up and Running at IP:8200
    ---
    ![](/Images/vault-login.jpg)
 
    ---
 
-Enter the root token to login.
-
+Enter the **Root token** to login.
 
 ## Integrate Vault for Secrets Management
 
