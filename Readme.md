@@ -16,7 +16,7 @@
 
 [Jenkins Installation](#Jenkins-Installation)
 
-- [Configuring Jenkins for CI/CD with Additional Tools](#Configuring-Jenkins-for-CI/CD-with-Additional-Tools)
+- [Configuring Jenkins for CI-CD with Additional Tools](#Configuring-Jenkins-for-CI-CD-with-Additional-Tools)
 
 - [Troubleshooting Updating Jenkins IP Address](#Troubleshooting-Updating-Jenkins-IP-Address)
 
@@ -25,6 +25,7 @@
 - [Install Terraform](#Install-Terraform)
 - [Install TFScan](#Install-TFScan)
 - [Install Trivy](#Install-Trivy)
+- 
 
 
 
@@ -246,7 +247,7 @@ After entering the initial admin password, you will be redirected to a page to s
 
 Provide the necessary details to create your Jenkins account, then  select **Install the suggested plugins** and login to your account.
 
-### Configuring Jenkins for CI/CD with Additional Tools
+### Configuring Jenkins for CI-CD with Additional Tools
 
 #### 1. Install Essential Plugins
 
