@@ -585,6 +585,13 @@ Verify if the container is running using:
 ```sh
 docker ps
 ```
+### Command Execution Status
+
+---
+
+![](/Images/sonarqube-container.jpg)
+
+---
 
 
 ### Sonarqube Successfully Running on Port 9000
@@ -617,8 +624,8 @@ Upon first login, you will be prompted to change the default password for securi
 
 ---
 
-#### Adding SonarQube Configuration to Jenkins
-1. Go to **Manage Jenkins > Configure System**.
+### Adding SonarQube Configuration to Jenkins
+1. Go to **Manage Jenkins > System**.
 2. Scroll to **SonarQube Servers** and click **Add SonarQube**.
 3. Enter the following details:
    - **Name**: SonarQube server (or any identifier).
@@ -630,19 +637,25 @@ Upon first login, you will be prompted to change the default password for securi
 
 ---
 
-Save the configuration.
+**Save the configuration.**
 
 
- **Note:** Store `sonar.projectName`, `sonar.projectKey`, and `Token` in a separate place.
+ ### **Important Note:**  
+Before proceeding, make sure to securely store the following values, as they will be required later:  
+- `sonar.projectName`  
+- `sonar.projectKey`  
+- `Token`  
 
- #### Create a New Project in SonarQube
+#### Create a New Project in SonarQube
+
 1. Log in to SonarQube.
-2. Click **Create New Project** and provide the project name (e.g., `Sample E-Commerce Project`).
-3. Select **Use the global setting**, then click **Create Project**.
+2. Click **Create a local project** and provide the project name (e.g. `Sample E-Commerce Project`).
+3. Branch should be `main` then `Next`
+4. Select **Use the global setting**, then click **Create Project**.
 
 #### Generate an Authentication Token
 1. Navigate to **My Account > Security**.
-2. Under **Generate Tokens**, enter a token name (e.g., `SampleProjectToken`).
+2. Under **Generate Tokens**, enter a token name (e.g. `Sample Project Token`).
 3. Select **Global Analysis** from the dropdown.
 4. Click **Generate** and copy the token (save it securely; it will not be displayed again).
 
@@ -696,7 +709,7 @@ Save the configuration.
    Add the following content:
    ```
    # Unique project identifier in SonarQube
-   sonar.projectKey=SampleECommersProject     
+   sonar.projectKey=Sample-E-Commerce-Project     
 
    # Display name of the project
    sonar.projectName=Sample E-Commerce Project 
