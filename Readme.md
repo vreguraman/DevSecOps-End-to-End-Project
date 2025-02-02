@@ -299,7 +299,7 @@ Provide the necessary details to create your Jenkins account.
 
 #### 1. Install Essential Plugins
 
-1. Go to Jenkins **Dashboard** > **Manage Jenkins** > **Manage Plugins**.
+1. Go to Jenkins **Dashboard** > **Manage Jenkins** > **Plugins**.
    
 2. Navigate to the **Available** tab and search for these plugins:
    
@@ -376,6 +376,8 @@ sudo yum install -y terraform
 ```bash
 terraform --version
 ```
+
+### Command Output Snapshot
 ---
 ![](/Images/terraform/succesfull-installation%20.jpg)
 
@@ -403,9 +405,39 @@ curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/inst
 ```bash
 sudo mv /root/bin/trivy /usr/local/bin/trivy
 ```
+
+### Troubleshooting Trivy Installation
+
+If you encounter an issue where `trivy` is not found after installation, follow these steps to locate and move it manually:
+
+### Issue
+You may see the following error when trying to move `trivy`:
 ```bash
+mv: cannot stat '/root/bin/trivy': No such file or directory
+```
+### Solution
+
+### Find where `trivy` was installed by running:
+```sh
+find / -name trivy 2>/dev/null
+```
+This should return a path similar to:
+```sh
+/root/DevSecOps-End-to-End-Project/src/bin/trivy
+```
+
+### Move `trivy` to `/usr/local/bin/` for system-wide access:
+```sh
+mv /root/DevSecOps-End-to-End-Project/src/bin/trivy /usr/local/bin/trivy
+```
+
+### Verify the installation:
+```sh
 trivy --version
 ```
+If the installation was successful, this should output the installed Trivy version.
+
+### Command Execution Status
 ---
 ![](/Images/Scanners/trivy-version.jpg)
 
@@ -419,6 +451,34 @@ npm install -g snyk
 ```bash
 snyk --version
 ```
+
+### Terminal Session Output
+---
+![](/Images/snyk-version.jpg)
+
+---
+
+### Install Ansible
+
+### Install `ansible` using `pip`:
+```sh
+yum install pip -y  
+```
+```bash
+pip install ansible
+```
+```bash
+ansible --version
+```
+This will install Ansible and display the installed version like shown below
+
+### Execution Log in Terminal
+---
+![](/Images/ansible-version.jpg)
+
+---
+
+
 
 ### Configuring Global Tools in Jenkins
 
