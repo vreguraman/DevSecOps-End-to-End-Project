@@ -270,7 +270,7 @@ After entering the initial admin password, you will be redirected to a page to i
 ### You will see the plugins are getting installed once you click on suggested plugins:
  ---
  ![](/Images/jenkins-install-plugins-started.jpg)
- 
+
  ---
 
 ### Create Jenkins User
@@ -283,7 +283,17 @@ After installing plugins, you will be redirected to a page to set up a Jenkins u
 
 ---
 
-Provide the necessary details to create your Jenkins account, then  select **Install the suggested plugins** and login to your account.
+Provide the necessary details to create your Jenkins account.
+
+### Once the plugins installed you will see jenkins url as shown below:
+
+---
+![](/Images/jenkins-url.jpg)
+
+
+**Save and Finish to start using Jenkins**
+
+---
 
 ### Configuring Jenkins for CI-CD with Additional Tools
 
