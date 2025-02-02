@@ -492,6 +492,7 @@ ansible --version
 
 ---
 Refer to the above screenshot to configure **Terraform & Ansible.**
+
 **Note**: Ensure that you uncheck `Install automatically.`
 
 2. **Terraform**:
