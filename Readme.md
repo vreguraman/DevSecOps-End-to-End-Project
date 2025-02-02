@@ -470,7 +470,7 @@ pip install ansible
 ```bash
 ansible --version
 ```
-This will install Ansible and display the installed version like shown below
+
 
 ### Execution Log in Terminal
 ---
@@ -486,6 +486,14 @@ This will install Ansible and display the installed version like shown below
    - Go to **Manage Jenkins > Global Tool Configuration**.
    - Under Git, click **Add Git** and set the path to `/usr/bin/git`.
 
+
+---
+![](/Images/git-path.jpg)
+
+---
+Refer to the above screenshot to configure **Terraform & Ansible.**
+**Note**: Ensure that you uncheck `Install automatically.`
+
 2. **Terraform**:
    - Add Terraform under Terraform installations.
    - Ensure the binary is installed at `/usr/bin/`.
@@ -493,13 +501,17 @@ This will install Ansible and display the installed version like shown below
 3. **Ansible**:
    - Add Ansible installation and set the path to `/usr/bin/`.
 
+Click on `Apply & Save` to continue.
+
+---
+
 ### Create Your First Job to Verify Jenkins
 
 Follow these steps to create a Freestyle Project in Jenkins to verify that Jenkins is properly configured with additional tools:
 
 1. **Create a Freestyle Project:**
    - Go to the **Jenkins Dashboard** and click on **New Item**.
-   - Enter a name for your job (e.g., `Verify-Jenkins`) and select **Freestyle Project**.
+   - Enter a name for your job (e.g. `Verify-Jenkins`) and select Freestyle Project.
 
 2. **Configure the Build Steps:**
    - Scroll down to the **Build** section and click **Add build step**.
@@ -520,16 +532,18 @@ Follow these steps to create a Freestyle Project in Jenkins to verify that Jenki
 
 
 2. Save and build the job.
-3. Check the console output to verify the installed versions.
+
+
+### Check the console output to verify the installed versions.
 
 ---
 
 ![](/Images/version-verification.jpg)
+
 ---
+## Deploying SonarQube as a Container
 
-
-
-### Install and Configure SonarQube:
+### Steps to Install and Configure SonarQube:
 
 1. Install Docker:
 
@@ -541,24 +555,61 @@ sudo systemctl enable docker
 sudo systemctl start docker
 ```
 
-2. Run SonarQube Container:
-
+2. Check Docker Status:
 ```bash
+sudo systemctl status docker
+```
+### Terminal View of Executed Commands
+
+---
+![](/Images/docker-status.jpg)
+
+---
+
+###  Run the SonarQube Container
+
+Execute the following command to pull and run the latest SonarQube container in detached mode (`-d`), mapping it to port **9000**:
+
+```sh
 docker run -d --name sonarcontainer -p 9000:9000 sonarqube:latest
 ```
 
-3. Access SonarQube:
+- `-d` → Runs the container in detached mode (in the background).  
+- `--name sonarcontainer` → Assigns a custom name (`sonarcontainer`) to the container for easy management.  
+- `-p 9000:9000` → Maps port **9000** of the container to port **9000** of the host machine.  
+- `sonarqube:latest` → Uses the latest available SonarQube image from Docker Hub.
 
-   - URL: `http://<your-ec2-ip>:9000`.
+Verify if the container is running using:
+
+```sh
+docker ps
+```
+
+
+### Sonarqube Successfully Running on Port 9000
+
+Once the container is running, access the SonarQube web interface:
+
+- Open a browser and navigate to:  
+  ```bash
+  http://<your-ec2-ip>:9000
+   ```
+
+### Console Output After Command Execution
+
 ---
 
 ![](/Images/Sonar/9.sonar.jpg)
 
 ---
 
-- Login: Username: `admin`, Password: `admin` (you will be prompted to reset the password).
+### Default Credentials
+- **Username:** `admin`  
+- **Password:** `admin`  
 
-   Provide a new Password : `Example@12345`
+Upon first login, you will be prompted to change the default password for security.
+
+   Provide a new Password : `Example@12345` (Suggested)
 
 ---
    ![](/Images/Sonar/10.sonar-update.jpg)
