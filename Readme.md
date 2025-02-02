@@ -267,6 +267,12 @@ After entering the initial admin password, you will be redirected to a page to i
 
  Select **Install suggested plugins** to install necessary plugins
 
+### You will see the plugins are getting installed once you click on suggested plugins:
+ ---
+ ![](/Images/jenkins-install-plugins-started.jpg)
+ 
+ ---
+
 ### Create Jenkins User
 After installing plugins, you will be redirected to a page to set up a Jenkins user account. Fill in the required details:
 
