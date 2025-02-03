@@ -57,7 +57,27 @@ This **DevSecOps project** demonstrates the implementation of a secure and autom
 ## Architecture
 ---
 ![](/Images/Devsecops.png)
+
 ---
+
+### Cost Optimization Decisions
+
+To ensure a cost-effective solution without compromising on functionality, all tools used in this DevSecOps project have been integrated into the Jenkins server. This approach avoids the need for additional servers or infrastructure, reducing operational costs.
+
+#### Rationale
+- **Centralized Integration**: Running all tools (e.g. Prometheus, Grafana, Trivy, TFsec, SonarQube, OWASP ZAP) on the same server minimizes resource utilization and eliminates the cost of multiple servers.
+- **Simplified Management**: Centralized integration simplifies maintenance, monitoring, and updates for all tools.
+- **Efficient Resource Usage**: Using the Jenkins server for multi-purpose tasks optimizes the allocated resources, leveraging idle capacity during pipeline executions.
+
+#### Implementation
+- All tools are installed and configured on the Jenkins server instance.
+- Prometheus and Grafana are set up to run on separate ports to avoid conflicts.
+- Tools like Trivy, TFsec, and OWASP ZAP are containerized or run as CLI tools, leveraging Docker where applicable.
+
+
+---
+
+
 
 ## Create Jenkins Server
 
