@@ -1298,15 +1298,24 @@ Ensure the `prometheus.yml` configuration file exists in the current directory
    ```
 
 1. Locate the `scrape_configs:` section.
-2. Find `- job_name:`.
-3. Replace the job name with `"nodejs-app"`.
+2. Replace the following in your `prometheus.yml` file:
+  - **Job Name**: Change it to `"nodejs-app"`.
+  - **Host**: Replace `localhost` with your public IP address.
+  - **Port**: Update the port to `3000`.
 
+Here’s an example of the updated configuration:
 ```yaml
 scrape_configs:
-  - job_name: "nodejs-app"
-    # Additional configuration here
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "node-js-app"
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ["<public IP>:3000"]   # Replace with your Public IP
 ```
-4. Save the file in the same directory as Prometheus.
+ Save the file in the same directory as Prometheus.
 
 #### Run Prometheus
 
@@ -1450,7 +1459,7 @@ After initial login you will be prompted to change the password upon your first 
 
 #### Configure Prometheus as a Data Source
 Add Prometheus as a data source.
- -  In Grafana Dashboard.
+ -  In Grafana Home page.
  -  Click on **data source.**
 
 ### The following page will appear:
@@ -1459,16 +1468,18 @@ Add Prometheus as a data source.
    ![](/Images/grafana-data-source.jpg)
 
    ---
-   Select **`Prometheus`** from the list
-   Enter Prometheus URL as shown below:
+   Select **`Prometheus`** from the list.
+
+   Enter Prometheus URL as shown below
 
 ---
    ![](/Images/grafana-prometheus.jpg)
 
 ---
+Click on **Save** to continue.
 
 #### Import a Pre-Built Dashboard
-Go to Dashboards > toggle menu > dashboards > new> Import in Grafana.
+Go to Home Page > toggle menu > dashboards > new> Import in Grafana.
 
 
 ---
@@ -1476,9 +1487,15 @@ Go to Dashboards > toggle menu > dashboards > new> Import in Grafana.
 
 ---
 
-Enter a **Dashboard ID:**
+#### Load the Node.js Dashboard
 
-Node js Dashboard: **11159** and click on load and select **`Prometheus`** in prometheus
+1. **Enter the Dashboard ID**:  
+   - Use the Dashboard ID for Node.js: **`11159`**.
+
+2. Click **Load** to fetch the dashboard configuration.
+
+3. In the next step, select **`Prometheus`** as the data source to proceed.
+
 
 #### The interface will appear as follows:
 
