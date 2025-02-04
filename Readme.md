@@ -76,9 +76,14 @@ To ensure a cost-effective solution without compromising on functionality, all t
 
 
 ---
+### Running the Application in the Background
 
+If you want to run the server continuously while using the terminal for other tasks, execute the provided command to run it in the background
 
+**Why Background Running?**
+Running the server in the background avoids the need to open duplicate terminals when integrating other tools or performing additional tasks.
 
+---
 ## Create Jenkins Server
 
 ### Creating an EC2 Instance:
@@ -188,7 +193,13 @@ Run the application to generate and send telemetry data to the OpenTelemetry Col
 #### Steps:
 1. Executing node server.js in Background
    ```bash
-   node server.js &
+   node server.js 
+   ```
+   **To Run in the Background:**  
+This allows you to keep the process running without needing to open duplicate terminals.
+
+ ```bash
+   node server.js & 
    ```
 
 2. Access the application at:
@@ -1227,7 +1238,8 @@ The `-field=api_token` flag extracts only the token value.
    ```bash
    node server.js 
    ```
-If you want to run it in the background, use:
+**To Run in the Background:**  
+This allows you to keep the process running without needing to open duplicate terminals.
 
    ```bash
    node server.js &
@@ -1303,7 +1315,8 @@ scrape_configs:
   ```bash
    ./prometheus --config.file=prometheus.yml
    ```
-- If you want to run it in the background, use:
+**To Run in the Background:**  
+This allows you to keep the process running without needing to open duplicate terminals.
 
    ```bash
    ./prometheus --config.file=prometheus.yml &
@@ -1363,7 +1376,7 @@ scrape_configs:
 
 ### Resolve Port Conflict with Grafana
 
-You may encounter the following error because Grafana tries to access port 3000, which is already occupied by Node.js. To resolve this, we need to change the Grafana port to 3001.
+You may encounter an **error** because Grafana tries to access port 3000, which is **already occupied** by Node.js. To resolve this, we need to change the Grafana port to 3001.
 
 #### Steps to Change the Grafana Port
 
@@ -1381,7 +1394,7 @@ cd ../conf
 ```bash
 vi defaults.ini
 ```
-4.Add the following line to set the `Grafana port` to 3001:
+4.Add the following line to set the `Grafana port` to 3001 as shown below:
 ```bash
 http_port = 3001
 ```
@@ -1401,23 +1414,31 @@ Run Grafana again:
 ```bash
 ./grafana-server  
 ```
+**To Run in the Background:**  
+This allows you to keep the process running without needing to open duplicate terminals.
+```bash
+./grafana-server &
+```
+   Access Grafana: 
+   ```bash
+   http://<server-ip>:3001.
+   ```
 
-   Access Grafana: `http://<server-ip>:3001`.
-
-### You will see the below screen:
+### Grafana Running and Accessible on the Browser
 
    ---
 ![](/Images/grafana-1.jpg)
 
    ---
 
-Login using default credentials:
+#### Login with Default Credentials
 
-Username: admin
+1. Use the following default credentials to log in:
+   - **Username:** `admin`
+   - **Password:** `admin`
 
-Password: admin
+After initial login you will be prompted to change the password upon your first login. Follow the instructions to set a strong, secure password.
 
-Change the password upon first login.
 
 
 ### Once you login you will see Grafana Dashboard as shown below:
@@ -1429,8 +1450,8 @@ Change the password upon first login.
 
 #### Configure Prometheus as a Data Source
 Add Prometheus as a data source.
- -  In Grafana, go to Configuration > **Data Sources**
- -  Click **Add data source.**
+ -  In Grafana Dashboard.
+ -  Click on **data source.**
 
 ### The following page will appear:
 
