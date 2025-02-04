@@ -920,26 +920,27 @@ To verify Vault integration with Jenkins, follow these steps:
    jq -r '.data.secret_key' aws_creds.json
    ```
 
-4. **Run the Job**:
+4. **Run the Job:**
 
 - Click Save and then Build Now.
-5. Verify the Output:
+
+5. **Verify the Output:**
 
 - Check the Console Output to ensure:
 - Vault connection is successful.
-- AWS credentials are retrieved and displayed.
+- The AWS credentials are retrieved and displayed below.
 
 ---
 ![](/Images/vault-job-success.jpg)
 
 ---
 
-### Integrating tfsec for Terraform Scanning
+### Integrating `Tfsec` to Enhance Terraform Security Scanning
 
 To scan Terraform files for potential security vulnerabilities using `tfsec`, follow these steps:
 
 1. **Ensure a Terraform File Exists**:
-   - Confirm that the required Terraform file (`.tf`) is available in the `/src` directory.
+   - Confirm that the required Terraform file (`.tf`) is available in the directory.
 
 2. **Navigate to the Terraform Directory**:
    ```bash
@@ -951,7 +952,7 @@ To scan Terraform files for potential security vulnerabilities using `tfsec`, fo
    ```bash
    tfsec .
    ```
-4. **Analyze the Output**:
+1. **Analyze the Output**:
 
 - Review the results of the scan for any identified security issues and resolve them as needed.
 
