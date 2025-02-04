@@ -339,7 +339,7 @@ Provide the necessary details to create your **Jenkins account.**
    - **Prometheus**: For Monitoring and Observability
    - **OpenTelemetry Agent Host Metrics Monitor Plugin**
 
-Install plugins as showen below:
+Install plugins as shown below:
 
 ---
 ![](/Images/Jenkins/plugins.jpg)
@@ -1081,9 +1081,10 @@ docker run -d -p 8081:8081 --name nexus sonatype/nexus3
      ```bash
      docker exec -it nexus cat /nexus-data/admin.password
      ```
+   **Click on the sign icon in the top-right corner.**
 3. The default credentials are:
    - **Username**: `admin`
-   - **Password**: Found in the container at `/nexus-data/admin.password`.
+   - **Password**: Retrived Password.
 ---
 
 ![](/Images/nexus-credentials.jpg)
@@ -1113,14 +1114,12 @@ docker run -d -p 8081:8081 --name nexus sonatype/nexus3
    - **Name**: Enter a name for the repository (e.g., `docker-hosted`).
    - Allow anonymous Docker pull: Enable this option if needed.
 
-4. Save the Configuration.
+4. Click on `create repository`.
 
 
-## Managing Credentials in HashiCorp Vault
+## Securely Managing Credentials with HashiCorp Vault
 
-
-
-### Storing Credentials in Vault
+### Storing and Accessing Credentials in Vault
 
 #### 1. Enable the KV Secrets Engine
 Ensure the KV secrets engine is enabled in Vault to securely store credentials.
@@ -1138,6 +1137,16 @@ vault kv put nexus/credentials \
     repo_url=https://nexus.example.com
 ```
 Replace `https://nexus.example.com` with your Nexus repository URL.
+
+#### How to Find Your Nexus Repository URL
+
+- Log in to your Nexus Repository.
+- Navigate to Nexus Repositories:
+   - Click on the "Settings" (gear icon) → "Repositories".
+- Identify the repository that you previously created, click on it.
+- Copy the repository URL displayed under the repository details as shown below.
+---
+![](/Images/nexus-url.jpg)
 
 ---
 
@@ -1174,9 +1183,14 @@ vault kv put secret/docker username="<user-name>" password="<your-password>"
 - Log in using your preferred method (e.g., email/password, GitHub, GitLab, or SSO).
 
 ### 2. Navigate to Your API Token
-- Click on your profile picture or initials in the top-right corner.
+- Click on your Organization bottom-left corner.
 - Select **Account Settings** from the dropdown menu.
-- Locate your API token under the **API Token** section.
+- Locate Auth token and click on `click to show` to view token.
+- Below is the screenshot for your reference
+---
+![](/Images/snyk-token.jpg)
+
+---
 
 ### 3. Enable the KV Secrets Engine (if not already enabled)
 ```bash
@@ -1209,11 +1223,18 @@ The `-field=api_token` flag extracts only the token value.
 2. Expose metrics in `server.js`. (included expose metrics in server.js)
 
 #### Next Steps
-1. Test this updated `server.js` locally:
+1. Test this updated `server.js`:
    ```bash
-   node server.js
+   node server.js 
    ```
-2. Access Prometheus metrics at: `http://<public-ip>:3000/metrics` to ensure it is working as expected.
+If you want to run it in the background, use:
+
+   ```bash
+   node server.js &
+   ```      
+
+
+   Access **Prometheus metrics** at: `http://<public-ip>:3000/metrics` to ensure it is working as expected.
 
 ### You will see the metrics once you access the URL:
 
@@ -1223,7 +1244,10 @@ The `-field=api_token` flag extracts only the token value.
 
 ---
 
-### Open a Separate Terminal for Prometheus Setup
+### Open a Separate Terminal for Prometheus Setup 
+
+**Important** : Jump to **Install and Configure Prometheus** if you run node js in Background
+
 1. **Right-click** on the tab of your terminal session.
 2. From the context menu, select the option **'Duplicate Session'**.
 3. This will open a new tab with a duplicate of your current terminal session, which you can use to continue the setup process.
@@ -1247,9 +1271,19 @@ The `-field=api_token` flag extracts only the token value.
    ```
    
 
-#### Configure Prometheus
+### Configure Prometheus
 
-Inside the Prometheus Folder:
+1. **Find the `prometheus.yml` File** 
+Ensure the `prometheus.yml` configuration file exists in the current directory
+
+2. **Verify the file**
+   ```bash
+   ls
+   ```
+2. **Edit the File**
+   ```bash
+   vi prometheus.yml
+   ```
 
 1. Locate the `scrape_configs:` section.
 2. Find `- job_name:`.
@@ -1264,16 +1298,26 @@ scrape_configs:
 
 #### Run Prometheus
 
-To start the Prometheus server, use the following command:
+- To start the Prometheus server, use the following command:
 
   ```bash
    ./prometheus --config.file=prometheus.yml
    ```
-**Prometheus Server**: http://public-ip:9090/
+- If you want to run it in the background, use:
 
-##### Verify Prometheus Server
+   ```bash
+   ./prometheus --config.file=prometheus.yml &
+   ```
 
 - Open the Prometheus server in your browser.
+   ```bash
+   http://Public-ip:9090/
+   ```
+### Prometheus Successfully Running on Port 9090
+---
+![](/Images/prometheus-dashboard.jpg)
+
+---
 
 - Navigate to the Status tab.
 
@@ -1289,6 +1333,9 @@ To start the Prometheus server, use the following command:
 ---
 
 ### Open a Separate Terminal for Grafana Setup
+
+**Important** : Jump to **Install and Configure Grafana** if you run `Prometheus` in Background
+
 1. **Right-click** on the tab of your terminal session.
 2. From the context menu, select the option **'Duplicate Session'**.
 3. This will open a new tab with a duplicate of your current terminal session, which you can use to continue the setup process.
