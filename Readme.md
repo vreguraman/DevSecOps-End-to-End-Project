@@ -1456,7 +1456,7 @@ Add Prometheus as a data source.
 ### The following page will appear:
 
    ---
-   ![](/images/grafana-datasource.jpg)
+   ![](/Images/grafana-data-source.jpg)
 
    ---
    Select **`Prometheus`** from the list
