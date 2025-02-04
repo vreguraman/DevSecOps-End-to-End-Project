@@ -1913,18 +1913,10 @@ To ensure the metrics are accurate, you can verify them manually by scanning tf 
 
 2. The output will display the same number of vulnerabilities as seen in Grafana:  
  
-   ---  
+---  
    ![](/Images/tfsec-manual.jpg)
 
-   ---
----
-
-
-
-
-
-
-
+ ---
 
 ## OpenTelemetry Setup and Configuration
 Since we have already installed the OpenTelemetry-related dependencies and updated the `collectorUrl` in `server.js` earlier, let's proceed with downloading the OpenTelemetry Collector.
