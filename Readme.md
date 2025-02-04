@@ -981,7 +981,11 @@ If Docker is not already installed, use the following command to install Docker:
 ```bash
 sudo yum install docker -y
 ```
+Navigate to **Docker** directory
+```bash
+cd DevSecOps-End-to-End-Project/Docker
 
+```
 ### Steps to Integrate Trivy for Image Scanning
 
 1. **Create the Dockerfile**:
@@ -1519,6 +1523,11 @@ Trivy and TFsec are powerful security scanning tools for containers and Infrastr
 
 ## Trivy Integration
 
+###  Run Trivy and Generate JSON Output
+Navigate to Docker directory:
+```bash
+cd DevSecOps-End-to-End-Project/Docker
+```
 ### Scan Docker Image with Trivy
 ```sh
 trivy image --format json --severity HIGH,CRITICAL <image-name> > trivy-results.json
@@ -1661,12 +1670,12 @@ http://<your-server-ip>:3001
 ---
 
 #### 3. Add a Visualization
-- Click on **Add visualization**, and you will be redirected to the following page:  
+ Click on **Add visualization**, and you will be redirected to the following page:  
   
   ---  
   ![](/Images/grafana-prometheus-trivy.jpg)  
   ---  
-- Select **Prometheus** as the data source.
+  Select **Prometheus** as the data source.
 
 #### 4. Run a Query
 - Enter the PromQL query `trivy_vulnerabilities` under the metrics field.
@@ -1681,7 +1690,7 @@ http://<your-server-ip>:3001
 
 #### 5. View Trivy Vulnerabilities
 
-- The dashboard will display the number of vulnerabilities:  
+ The dashboard will display the number of vulnerabilities:  
  
   ---  
   ![](/Images/trivy-vulnerabilities.jpg)  
@@ -1712,11 +1721,14 @@ To ensure the metrics are accurate, you can verify them manually by scanning an 
 ## TFsec Integration
 
 ###  Run TFsec and Generate JSON Output
-```sh
+Navigate to **terraform** directory:
+```bash
 cd /root/DevSecOps-End-to-End-Project/terraform
+```
+```bash
 tfsec . --format=json > tfsec-results.json
 ```
-
+After running this command, a tfsec-results.json file will be created.
 ###  Generate Prometheus Metrics from TFsec Results
 Create a file `generate-tfsec-metrics.js` and add the following content:
 
