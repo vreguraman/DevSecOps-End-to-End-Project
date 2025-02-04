@@ -1253,7 +1253,7 @@ If you want to run it in the background, use:
 3. This will open a new tab with a duplicate of your current terminal session, which you can use to continue the setup process.
 4. After entering into the duplicate terminal, get sudo access and navigate to:
    ```bash
-   cd Devops-CICD-End-to-End/src/
+   cd DevSecOps-End-to-End-Project/src
    ```
 
 
@@ -1341,7 +1341,7 @@ scrape_configs:
 3. This will open a new tab with a duplicate of your current terminal session, which you can use to continue the setup process.
 4. After entering into the duplicate terminal, get sudo access and navigate to:
    ```bash
-   cd Devops-CICD-End-to-End/src/
+   cd DevSecOps-End-to-End-Project/src
    ```
 
 ### Install and Configure Grafana
@@ -1395,7 +1395,7 @@ http_port = 3001
 Now, navigate back to the Grafana execution folder:
 
 ```bash
-cd /root/Devops-CICD-End-to-End/src/prometheus-2.47.0.linux-amd64/grafana-10.0.0/bin
+cd /root/DevSecOps-End-to-End-Project/src/prometheus-2.47.0.linux-amd64/grafana-10.0.0/bin
 ```
 Run Grafana again:
 ```bash
