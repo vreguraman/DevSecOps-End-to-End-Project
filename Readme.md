@@ -1428,7 +1428,7 @@ This allows you to keep the process running without needing to open duplicate te
 ```bash
 ./grafana-server &
 ```
-   Access Grafana: 
+   **Access Grafana:**
    ```bash
    http://<server-ip>:3001.
    ```
@@ -1556,13 +1556,13 @@ try {
     console.error('Error:', error.message);
 }
 ```
-Run the script:
+**Run the script:**
 ```sh
 node generate-trivy-metrics.js
 ```
 A `trivy-metrics.prom` file will be created.
 
-Move the file to the `metrics` directory:
+**Move the file to the `metrics` directory:**
 ```sh
 mv trivy-metrics.prom metrics
 ```
@@ -1571,29 +1571,142 @@ Start a simple HTTP server to expose metrics on **port 8085**:
 ```sh
 python3 -m http.server 8085
 ```
+Access `Trivy` metrics:
 
+```bash
+http://Public-ip:8085/
+```
+### Execution Log in Terminal
+---
+![](/Images/trivy-metrics-logs.jpg)
+
+---
+### Trivy Metrics is Now Live at IP:8085
+
+---
+![](/Images/trivy-metrics.jpg)
+
+---
+### Open a Separate Terminal
+
+1. **Right-click** on the tab of your terminal session.
+2. From the context menu, select the option **'Duplicate Session'**.
+3. This will open a new tab with a duplicate of your current terminal session, which you can use to continue the setup process.
+4. After entering into the duplicate terminal, get sudo access and navigate to:
+   ```bash
+   cd /root/DevSecOps-End-to-End-Project/src/prometheus-2.47.0.linux-amd64
+   ```
 ### Add Trivy to Prometheus Configuration
-Edit `prometheus.yaml`:
+Edit `prometheus.yml`:
 ```yaml
-scrape_configs:
   - job_name: "trivy"
     static_configs:
       - targets: ["<your-server-ip>:8085"]
 ```
-Reload Prometheus to apply changes.
+**Below is the screenshot for your reference:**
+
+---
+![](/Images/trivy-config.jpg)
+
+---
+
+### Reload Prometheus to Apply Changes
+
+Prometheus is already running in the background, follow these steps to reload it with the updated configuration:
+
+#### Steps to Reload Prometheus
+
+1. **Find the Process ID (PID):**
+   Use the following command to locate the PID of the Prometheus process:
+   ```bash
+   ps aux | grep prometheus
+   ```
+2. **Stop the Current Process:** Terminate the Prometheus process using the PID from the previous step:   
+
+   ```bash
+   kill <PID>
+   ```
+Replace <PID> with the actual Process ID.
+3. **Restart Prometheus in the Background:** Start Prometheus with the updated configuration in the background:
+   ```bash
+   ./prometheus --config.file=prometheus.yml &
+   ```
+### Prometheus is successfully scraping metrics from Trivy
+---
+![](/Images/trivy-prometheus.jpg)
+
+---
+
+The above screenshot confirms that Prometheus is successfully scraping metrics from Trivy.
 
 ### Visualize Trivy Metrics in Grafana
-1. Open Grafana (`http://<your-server-ip>:3000`)
-2. Navigate to **Configuration → Data Sources**
-3. Add **Prometheus** as a data source with URL `http://localhost:9090`
-4. Create a new dashboard:
-   - Add a new panel
-   - Use PromQL query:
-     ```
-     trivy_vulnerabilities
-     ```
-   - Choose a visualization type (Table, Gauge, Time Series, etc.)
-   - Save the dashboard
+
+Follow these steps to visualize Trivy metrics in Grafana:
+
+#### 1. Open Grafana
+Access Grafana in your browser:
+```bash
+http://<your-server-ip>:3001
+```
+
+#### 2. Create a New Dashboard
+- Navigate to the **Grafana Home Page**.
+- Click on **Create your first Dashboard**.
+
+### You will see the following page: 
+
+---  
+![](/Images/grafana-prebuild.jpg)  
+
+---
+
+#### 3. Add a Visualization
+- Click on **Add visualization**, and you will be redirected to the following page:  
+  
+  ---  
+  ![](/Images/grafana-prometheus-trivy.jpg)  
+  ---  
+- Select **Prometheus** as the data source.
+
+#### 4. Run a Query
+- Enter the PromQL query `trivy_vulnerabilities` under the metrics field.
+- Click on **Run Query**.
+- Choose a visualization type, such as **Table**, **Gauge**, or **Time Series**.
+
+#### Example: 
+
+---  
+![](/Images/grafana-trivy-query.jpg)  
+---
+
+#### 5. View Trivy Vulnerabilities
+
+- The dashboard will display the number of vulnerabilities:  
+ 
+  ---  
+  ![](/Images/trivy-vulnerabilities.jpg)  
+
+  ---
+
+#### 6. Save the Dashboard
+- Once you are satisfied with the visualization, save the dashboard for future use.
+
+---
+
+#### Verify Trivy Metrics Manually
+
+To ensure the metrics are accurate, you can verify them manually by scanning an image directly with Trivy:
+
+1. Run the following command:
+   ```bash
+   trivy image <image-name>
+   ```
+
+2. The output will display the same number of vulnerabilities as seen in Grafana:  
+ 
+   ---  
+   ![](/Images/trivy-succes.jpg)  
+   ---
 ---
 
 ## TFsec Integration
