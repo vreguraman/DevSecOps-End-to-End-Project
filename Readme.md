@@ -963,7 +963,7 @@ To scan Terraform files for potential security vulnerabilities using `tfsec`, fo
 
 
 
-## Integrating Trivy for Container Image Scanning
+## Integrating `Trivy` to Enhance Container Image Scanning
 
 ### Install Docker
 If Docker is not already installed, use the following command to install Docker:
@@ -974,7 +974,7 @@ sudo yum install docker -y
 ### Steps to Integrate Trivy for Image Scanning
 
 1. **Create the Dockerfile**:
-   - The Dockerfile is already available in the `/src` directory. Below is an example of the Dockerfile:
+   - The Dockerfile is already available in the `/Docker` directory. Below is an example of the Dockerfile:
    ```dockerfile
    FROM node:16-alpine
    WORKDIR /app
@@ -992,17 +992,23 @@ sudo yum install docker -y
    docker build -t sample-ecommerce-app .
    ```
 
+### What You Can Expect After Running the Command
+---
+![](/Images/docker-image-build.jpg)
+
+---
+
 3. **Run the Docker Container (Optional for Testing)**:
    - To test the container, run:
    ```bash
    docker run -p 3000:3000 sample-ecommerce-app
    ```
-   - Access the application in your browser at:
-     ```
-     http://<your-server-ip>:3000
-     ```
+ - Access the application in your browser at:
+   ```
+   http://<your-server-ip>:3000
+   ```
 
-     ![](/Images/1.NodeJs.jpg)
+   ![](/Images/1.NodeJs.jpg)
 
 4. **Scan the Image with Trivy**:
    - Use Trivy to scan the Docker image for vulnerabilities:
@@ -1045,7 +1051,7 @@ To store and share your Docker image, push it to a container registry like Docke
    ```
 4. Verify on Docker Hub.
    
-#### After running the steps, the output will appear as follows:
+### After running the steps, the output will appear as follows:
 ---
 
 ![](/Images/dockerhub-success.jpg)
@@ -1053,7 +1059,7 @@ To store and share your Docker image, push it to a container registry like Docke
 ---
 
 
-## Running Nexus Repository as Container
+## Deploying Nexus Repository as a Docker Container
 
 ### Run the Nexus Container
 To deploy the Nexus Repository as a container, run the following command:
