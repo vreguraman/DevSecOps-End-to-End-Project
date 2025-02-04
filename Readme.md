@@ -1606,7 +1606,9 @@ http://Public-ip:8085/
    cd /root/DevSecOps-End-to-End-Project/src/prometheus-2.47.0.linux-amd64
    ```
 ### Add Trivy to Prometheus Configuration
-Edit `prometheus.yml`:
+```bash
+vi prometheus.yml
+```
 ```yaml
   - job_name: "trivy"
     static_configs:
@@ -1686,6 +1688,7 @@ http://<your-server-ip>:3001
 
 ---  
 ![](/Images/grafana-trivy-query.jpg)  
+
 ---
 
 #### 5. View Trivy Vulnerabilities
@@ -1755,48 +1758,172 @@ fs.writeFileSync('tfsec-metrics.prom', metrics);
 
 console.log("Metrics file tfsec-metrics.prom created successfully.");
 ```
-Run the script:
+**Run the script:**
 ```sh
 node generate-tfsec-metrics.js
 ```
 A `tfsec-metrics.prom` file will be created.
 
-Move the file to the `metrics` directory:
+**Move the file to the `metrics` directory:**
 ```sh
 mv tfsec-metrics.prom metrics
 ```
 
 Start a simple HTTP server to expose metrics  on **port 8086**:
 ```sh
-python3 -m http.server 8086
+python3 -m http.server 8086 &
 ```
+### Execution Log in Terminal
+
+---
+![](/Images/tfsec-metrics-logs.jpg)
+
+---
+
+### Tfsec Metrics is Now Live at IP:8086
+---
+![](/Images/tf-metrics.jpg)
+
+---
+
+### Open a Separate Terminal
+
+1. **Right-click** on the tab of your terminal session.
+2. From the context menu, select the option **'Duplicate Session'**.
+3. This will open a new tab with a duplicate of your current terminal session, which you can use to continue the setup process.
+4. After entering into the duplicate terminal, get sudo access and navigate to:
+   ```bash
+   cd /root/DevSecOps-End-to-End-Project/src/prometheus-2.47.0.linux-amd64
+   ```
 
 ### Add TFsec to Prometheus Configuration
-Edit `prometheus.yaml`:
+```bash
+vi prometheus.yml
+```
+
 ```yaml
-scrape_configs:
   - job_name: "tfsec"
     static_configs:
       - targets: ["<your-server-ip>:8086"]
 ```
-Reload Prometheus to apply changes.
+**Below is the screenshot for your reference:**
 
-### Step 4: Visualize TFsec Metrics in Grafana
-1. Open Grafana (`http://<your-server-ip>:3000`)
-2. Navigate to **Configuration → Data Sources**
-3. Add **Prometheus** as a data source with URL `http://localhost:9090`
-4. Create a new dashboard:
-   - Add a new panel
-   - Use PromQL query:
-     ```
-     tfsec_vulnerabilities
-     ```
-   - Choose a visualization type (Table, Gauge, Time Series, etc.)
-   - Save the dashboard
+---
+![](/Images/tfsec-config.jpg)
 
-Now, you can monitor security vulnerabilities detected by Trivy and TFsec in Grafana!
+---
 
-----
+### Reload Prometheus to Apply Changes
+
+Prometheus is already running in the background, follow these steps to reload it with the updated configuration:
+
+#### Steps to Reload Prometheus
+
+1. **Find the Process ID (PID):**
+   Use the following command to locate the PID of the Prometheus process:
+   ```bash
+   ps aux | grep prometheus
+   ```
+2. **Stop the Current Process:** Terminate the Prometheus process using the PID from the previous step:   
+
+   ```bash
+   kill <PID>
+   ```
+Replace <PID> with the actual Process ID.
+3. **Restart Prometheus in the Background:** Start Prometheus with the updated configuration in the background:
+   ```bash
+   ./prometheus --config.file=prometheus.yml &
+   ```
+
+### Prometheus is successfully scraping metrics from Tfsec
+---
+![](/Images/tfsec-up.jpg)
+
+---
+The above screenshot confirms that Prometheus is successfully scraping metrics from Tfsec.
+
+### Visualize Tfsec Metrics in Grafana
+
+Follow these steps to visualize Tfsec metrics in Grafana:
+
+#### 1. Open Grafana
+Access Grafana in your browser:
+```bash
+http://<your-server-ip>:3001
+```
+
+#### 2. Create a New Dashboard
+- Navigate to the **Grafana Home Page**.
+- Click on **Create your first Dashboard**.
+
+### You will see the following page: 
+
+---  
+![](/Images/grafana-prebuild.jpg)  
+
+---
+
+#### 3. Add a Visualization
+ Click on **Add visualization**, and you will be redirected to the following page:  
+  
+  ---  
+  ![](/Images/grafana-prometheus-trivy.jpg)  
+  ---  
+  Select **Prometheus** as the data source.
+
+#### 4. Run a Query
+- Enter the PromQL query `tfsec_vulnerabilities` under the metrics field.
+- Click on **Run Query**.
+- Choose a visualization type, such as **Table**, **Gauge**, or **Time Series**.
+
+#### Example: 
+
+---  
+![](/Images/tfsec-query.jpg)
+
+---
+
+#### 5. View Tfsec Vulnerabilities
+
+ The dashboard will display the number of vulnerabilities:  
+ 
+  ---  
+  ![](/Images/tfsec_vulnerabilities.jpg) 
+
+  ---
+
+  > **Note:** Previously, when TFSec was run, no vulnerabilities were detected, and the scan results were clear. To demonstrate the Grafana dashboard functionality, I intentionally made changes to the **main.tf** file to introduce vulnerabilities.
+
+
+
+
+#### 6. Save the Dashboard
+- Once you are satisfied with the visualization, save the dashboard for future use.
+
+---
+
+#### Verify Tfsec Metrics Manually
+
+To ensure the metrics are accurate, you can verify them manually by scanning tf files directly with tfsec:
+
+1. Run the following command:
+   ```bash
+   tfsec .
+   ```
+
+2. The output will display the same number of vulnerabilities as seen in Grafana:  
+ 
+   ---  
+   ![](/Images/tfsec-manual.jpg)
+     
+   ---
+---
+
+
+
+
+
+
 
 
 ## OpenTelemetry Setup and Configuration
