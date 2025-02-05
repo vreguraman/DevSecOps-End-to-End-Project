@@ -135,18 +135,18 @@ pipeline {
                 archiveArtifacts artifacts: 'src/trivy-report.txt', allowEmptyArchive: true
             }
         }
-
-        // Nexus Integration
         stage('Nexus Integration') {
             steps {
                 sh '''
                 echo "Fetching Nexus credentials from Vault..."
+
                 export VAULT_ADDR="${VAULT_ADDR}"
                 export VAULT_TOKEN="${VAULT_TOKEN}"
 
                 NEXUS_USERNAME=$(vault kv get -field=username nexus/credentials) || { echo "Failed to fetch Nexus username"; exit 1; }
                 NEXUS_PASSWORD=$(vault kv get -field=password nexus/credentials) || { echo "Failed to fetch Nexus password"; exit 1; }
                 NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials) || { echo "Failed to fetch Nexus repo URL"; exit 1; }
+
 
                 echo "Uploading Node.js application archive to Nexus..."
                 ARTIFACT=src/app.tar.gz
@@ -157,25 +157,53 @@ pipeline {
                     $NEXUS_REPO_URL/repository/nodejs-app/ || { echo "Failed to upload artifact to Nexus"; exit 1; }
                 '''
             }
-        }
 
-        // Deploy Prometheus
-        stage('Deploy Prometheus') {
+        // Send Slack Notification
+        stage('Send Slack Notification') {
             steps {
-                dir('Prometheus') {
-                    sh '''
-                    echo "Removing existing Prometheus container if it exists..."
-                    docker rm -f prometheus || echo "No existing Prometheus container to remove."
+                script {
+                    def buildStatus = currentBuild.currentResult
+                    def color = (buildStatus == 'SUCCESS') ? 'good' : 'danger'
 
-                    echo "Deploying Prometheus for monitoring..."
-                    docker run -d \
-                        --name prometheus \
-                        -p 9090:9090 \
-                        -v $(pwd)/prometheus.yaml:/etc/prometheus/prometheus.yaml \
-                        prom/prometheus || { echo "Failed to deploy Prometheus"; exit 1; }
-                    '''
+                    // Define report file paths
+                    def reports = [
+                        "Trivy Report": "src/trivy-results.json",
+                        "TFSec Report": "terraform/tfscan-report.txt",
+                        "Terraform Plan": "terraform/terraform-plan.txt",
+                        "SonarQube Analysis": "sonarqube-report.txt",
+                        "Snyk Security Scan": "snyk-results.json"
+                    ]
+
+                    // Read and format report summaries
+                    def reportSummaries = reports.collect { name, path ->
+                        return fileExists(path) ? "*${name}:* ```" + readFile(path)[0..500] + "```" : "*${name}:* Report not found."
+                    }.join("\n")
+
+                    // Send Slack message with reports
+                    slackSend (
+                        channel: '#team-devops',
+                        message: "🚀 *Jenkins Pipeline Execution Completed: ${buildStatus}*\n\n${reportSummaries}",
+                        color: color
+                    )
                 }
             }
         }
     }
+    // Snyk Security Scan
+    stage('Snyk Security Scan') {
+        steps {
+            dir('src') {
+                sh '''
+                echo "Running Snyk Security Scan..."
+                snyk test --json > snyk-results.json || echo "Snyk scan completed with warnings."
+                echo "Verifying Snyk report..."
+                ls -l snyk-results.json || { echo "Snyk report not found"; exit 1; }
+                '''
+            }
+            archiveArtifacts artifacts: 'src/snyk-results.json', allowEmptyArchive: true
+        }
+    } 
+       
 }
+
+

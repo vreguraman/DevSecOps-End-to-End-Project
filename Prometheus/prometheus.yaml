@@ -32,3 +32,14 @@ scrape_configs:
     static_configs:
       - targets: ["65.2.150.42:8085"]     # Replace with your Public IP
 
+  - job_name: "tfsec"
+    static_configs:
+      - targets: ["52.66.246.248:8086"]     # Replace with your Public IP
+
+
+  - job_name: 'otel-collector'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["52.66.246.248:8888"]     # Replace with your Public IP
+
+
