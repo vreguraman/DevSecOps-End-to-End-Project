@@ -2024,6 +2024,117 @@ http://<your-server-ip>:3000/custom
 
 ---
 
+## Configure Prometheus to Scrape OpenTelemetry Metrics
+
+```bash
+vi prometheus.yml
+```
+
+```yaml
+  - job_name: 'otel-collector'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["your-public-ip:8888"]
+```
+*(Replace your-public-ip with your actual server IP)*
+
+**Below is the screenshot for your reference:**
+
+---
+![](/Images/otel-config.jpg)
+
+---
+
+### Reload Prometheus to Apply Changes
+
+Prometheus is already running in the background, follow these steps to reload it with the updated configuration:
+
+#### Steps to Reload Prometheus
+
+1. **Find the Process ID (PID):**
+   Use the following command to locate the PID of the Prometheus process:
+   ```bash
+   ps aux | grep prometheus
+   ```
+2. **Stop the Current Process:** Terminate the Prometheus process using the PID from the previous step:   
+
+   ```bash
+   kill <PID>
+   ```
+Replace <PID> with the actual Process ID.
+3. **Restart Prometheus in the Background:** Start Prometheus with the updated configuration in the background:
+   ```bash
+   ./prometheus --config.file=prometheus.yml &
+   ```
+### Prometheus is successfully scraping metrics from opentelemetry
+---
+![](/Images/otel-up.jpg)
+
+---
+The above screenshot confirms that Prometheus is successfully scraping metrics from opentelemetry.
+
+### Visualize OpenTelemetry Metrics in Grafana
+
+Follow these steps to visualize OpenTelemetry metrics in Grafana:
+
+#### 1. Open Grafana
+Access Grafana in your browser:
+```bash
+http://<your-server-ip>:3001
+```
+
+#### 2. Create a New Dashboard
+- Navigate to the **Grafana Home Page**.
+- Click on **Create your first Dashboard**.
+
+### You will see the following page: 
+
+---  
+![](/Images/grafana-prebuild.jpg)  
+
+---
+
+#### 3. Add a Visualization
+ Click on **Add visualization**, and you will be redirected to the following page:  
+  
+  ---  
+  ![](/Images/grafana-prometheus-trivy.jpg)  
+  ---  
+  Select **Prometheus** as the data source.
+
+#### 4. Run a Query
+- Enter the PromQL queries in the metrics field, run the query, and choose a visualization type like Table, Gauge, or Time Series.
+  - **CPU Usage Visualization**
+   ```PromQL
+   rate(process_cpu_seconds_total[5m])
+   ```
+   **Visualization Type**: Time Series
+   
+   ---
+   ![](/Images/otel-process-cpu.jpg)
+   
+   ---
+  - **Memory Usage Visualization**
+   ```PromQL
+   process_resident_memory_bytes
+   ```
+   **Visualization Type:** Gauge
+   
+   ---
+   ![](/Images/otel-memory-bytes.jpg)
+
+   ---
+  - **Uptime Visualization**
+   ```PromQL  
+   time() - process_start_time_seconds
+   ```
+   ---
+   ![](/Images/otel-process-start.jpg)
+
+   ---
+#### 6. Save the Dashboard
+- Once you are satisfied with the visualization, save the dashboard for future use.
+
 
 ## Conclusion:
 
