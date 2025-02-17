@@ -4,11 +4,11 @@ FROM node:16-alpine
 WORKDIR /app
 
 # Copy package.json from the src directory
-COPY ../src/package.json .  
+COPY src/package.json .  
 RUN npm install
 
 # Copy the full application source code from src
-COPY ../src .  
+COPY src .  
 
 # Expose the application port
 EXPOSE 3000
