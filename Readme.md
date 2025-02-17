@@ -1,4 +1,4 @@
-# Comprehensive DevSecOps Pipeline: Security, Monitoring & Automation
+# 🚀 End-to-End DevSecOps Implementation: CI/CD, Security, and Monitoring
 
 ## Table of Content:
 
@@ -907,40 +907,28 @@ vault write aws/roles/dev-role \
 }
 EOF
 ```
-## Jenkins Credentials Configuration for Vault
+## 🔐 **Secure Credentials in Jenkins Using HashiCorp Vault**
+🛡️ **How to Store Vault Secrets in Jenkins Securely?**
 
-### Steps to Store HashiCorp Vault Credentials in Jenkins
-
-###  Open Jenkins & Navigate to Credentials Management
-- Go to **Jenkins Dashboard**.
-- Click on **"Manage Jenkins"**.
-- Select **"Manage Credentials"**.
-- Under **"Stores scoped to Jenkins"**, click on **"Global credentials (unrestricted)"**.
-
-### Add Vault Address as a Secret Text Credential
-- Click **"Add Credentials"**.
-- Under **"Kind"**, select **"Secret text"**.
-- In the **"Secret"** field, paste your **Vault Address**.
-- In the **"ID"** field, enter `VAULT_ADDR`.
-- Click **"OK"** to save.
-
-### Add Vault Token as a Secret Text Credential
-- Click **"Add Credentials"** again.
-- Under **"Kind"**, select **"Secret text"**.
-- In the **"Secret"** field, paste your **Vault Token**.
-- In the **"ID"** field, enter `VAULT_TOKEN`.
-- Click **"OK"** to save.
-
-###  Verify Credentials in Jenkins
-- Go back to **"Global credentials"**.
-- Ensure **`VAULT_ADDR` and `VAULT_TOKEN`** are listed under stored credentials.
-- Use them in your Jenkins pipeline as:
-  ```groovy
-  environment {
-      VAULT_ADDR = credentials('VAULT_ADDR')
-      VAULT_TOKEN = credentials('VAULT_TOKEN')
-  }
-  ```
+ **Go to Jenkins Dashboard** → Click **Manage Jenkins**  
+ **Navigate to:** *Manage Credentials → Global → Add Credentials*  
+ Select **"Secret Text"** under **Kind**  
+ **Add Vault Address:**
+   - **Secret**: Paste your **Vault Address**
+   - **ID**: `VAULT_ADDR`
+   - Click **OK**
+ **Add Vault Token:**
+   - **Secret**: Paste your **Vault Token**
+   - **ID**: `VAULT_TOKEN`
+   - Click **OK**
+   
+### 🎯 **How to Use It in Jenkins Pipeline?**
+```groovy
+environment {
+    VAULT_ADDR = credentials('VAULT_ADDR')
+    VAULT_TOKEN = credentials('VAULT_TOKEN')
+}
+```
 
 ---
 
@@ -2182,43 +2170,51 @@ http://<your-server-ip>:3001
 
 --- 
 
-## Grafana Alerts Configuration
+## 🔔 **Jenkins Slack Notification Configuration**
+📢 Automate **Build Status Alerts** with Slack Integration in Jenkins!
 
-### Steps to Create Grafana Alerts for TFsec, Trivy, and OpenTelemetry Metrics
+### ✅ **Follow this Guide:**
+📌 [Step-by-Step Slack Notification Setup in Jenkins](https://www.youtube.com/watch?v=9ZUy3oHNgh8&t=789s)
 
-### **1️⃣ Open Grafana & Navigate to Alerting**
+---
+
+---
+
+## ⚠️ Configuring **Grafana Alerts** for Security & Performance Monitoring  
+
+### 📌 Step 1: Open Grafana & Navigate to Alerting
 - Go to **Grafana Dashboard** (`http://your-grafana-ip:3001`).
 - Click on **"Alerting" → "Alert Rules"**.
 - Click **"Create Alert Rule"**.
 
-### **2️⃣ Select Data Source & Define Alert Conditions**
-- Select **Prometheus** as the data source.
-- Enter a **PromQL query** to define when alerts should trigger.
+### 📌 Step 2: Select Data Source & Define Alert Conditions
+- Choose **Prometheus** as the data source.
+- Define a **PromQL query** to specify alert conditions.
 
-### **3️⃣ Define Alert Queries for TFsec, Trivy, and OTEL**
+### 📌 Step 3: Define Alert Queries for Each Tool  
 
-#### **🔴 Trivy Security Alerts (Critical Vulnerabilities)**
-- **PromQL Query:**
-  ```promql
-  trivy_vulnerabilities{severity="CRITICAL"} > 0
-  ```
+#### ✅ **Trivy Security Alerts (Critical Vulnerabilities)**
+```promql
+trivy_vulnerabilities{severity="CRITICAL"} > 0
+```
+
 - **Condition:** If `CRITICAL` vulnerabilities exist, trigger an alert.
 
-#### **🟠 TFsec Security Alerts (Terraform Misconfigurations)**
+#### ✅ TFsec Security Alerts (Terraform Misconfigurations)
 - **PromQL Query:**
   ```promql
   tfsec_vulnerabilities > 0
   ```
 - **Condition:** If TFsec detects infrastructure misconfigurations, trigger an alert.
 
-#### **🔵 OpenTelemetry Performance Alerts (High CPU Usage)**
+#### ✅OpenTelemetry Performance Alerts (High CPU Usage)
 - **PromQL Query:**
   ```promql
   rate(process_cpu_seconds_total[5m]) > 0.9
   ```
 - **Condition:** If CPU usage exceeds `90%` for `5 minutes`, trigger an alert.
 
-### **4️⃣ Configure Notification Channels**
+### 📌 Configure Notification Channels
 - Navigate to **"Alerting" → "Notification Policies"**.
 - Click **"Add a New Contact Point"**.
 
@@ -2239,12 +2235,12 @@ http://<your-server-ip>:3001
 - Select **"Email"** as the notification type.
 - Enter the recipient email (e.g., `security-team@company.com`).
 
-### **5️⃣ Enable Alerting & Save**
+### Enable Alerting & Save
 - Click **"Save & Apply"**.
 - Ensure **alert rules are active**.
 - Generate a **test alert** by manually increasing vulnerabilities or CPU usage.
 
-### **6️⃣ Verify Alerts**
+### Verify Alerts
 - Check if Slack, Teams, or Email notifications are received.
 - Adjust alert thresholds to minimize false positives.
 
@@ -2253,3 +2249,10 @@ http://<your-server-ip>:3001
 
 
 
+## 👥 Who Can Use This Project?  
+
+✅ **DevOps Engineers** - To implement security in CI/CD pipelines.  
+✅ **Security Teams** - To monitor vulnerabilities & enforce compliance.  
+✅ **Developers** - To integrate security scanning into development workflows.  
+✅ **Cloud Architects** - To manage Infrastructure as Code (IaC) securely.  
+✅ **Interview Candidates** - To showcase **hands-on experience** in DevSecOps.

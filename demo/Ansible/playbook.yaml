@@ -1,0 +1,22 @@
+---
+- name: Install Docker and Deploy Node.js App
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Start Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Pull Docker Image
+      command: docker pull nuthan0530/sample-ecommerce-nodejs-app
+
+    - name: Run Docker Container
+      command: docker run -d -p 80:3000 --name ecommerce-app nuthan0530/sample-ecommerce-nodejs-app
