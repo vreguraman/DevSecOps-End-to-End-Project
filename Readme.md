@@ -2143,8 +2143,76 @@ http://<your-server-ip>:3001
 #### 5. Save the Dashboard
 - Once you are satisfied with the visualization, save the dashboard for future use.
 
+--- 
 
-## Conclusion:
+## Grafana Alerts Configuration
 
-This setup ensures a complete CI/CD pipeline with integrated security tools for DevSecOps practices. Modify and scale as needed for specific project requirements.
+### Steps to Create Grafana Alerts for TFsec, Trivy, and OpenTelemetry Metrics
+
+### **1️⃣ Open Grafana & Navigate to Alerting**
+- Go to **Grafana Dashboard** (`http://your-grafana-ip:3001`).
+- Click on **"Alerting" → "Alert Rules"**.
+- Click **"Create Alert Rule"**.
+
+### **2️⃣ Select Data Source & Define Alert Conditions**
+- Select **Prometheus** as the data source.
+- Enter a **PromQL query** to define when alerts should trigger.
+
+### **3️⃣ Define Alert Queries for TFsec, Trivy, and OTEL**
+
+#### **🔴 Trivy Security Alerts (Critical Vulnerabilities)**
+- **PromQL Query:**
+  ```promql
+  trivy_vulnerabilities{severity="CRITICAL"} > 0
+  ```
+- **Condition:** If `CRITICAL` vulnerabilities exist, trigger an alert.
+
+#### **🟠 TFsec Security Alerts (Terraform Misconfigurations)**
+- **PromQL Query:**
+  ```promql
+  tfsec_vulnerabilities > 0
+  ```
+- **Condition:** If TFsec detects infrastructure misconfigurations, trigger an alert.
+
+#### **🔵 OpenTelemetry Performance Alerts (High CPU Usage)**
+- **PromQL Query:**
+  ```promql
+  rate(process_cpu_seconds_total[5m]) > 0.9
+  ```
+- **Condition:** If CPU usage exceeds `90%` for `5 minutes`, trigger an alert.
+
+### **4️⃣ Configure Notification Channels**
+- Navigate to **"Alerting" → "Notification Policies"**.
+- Click **"Add a New Contact Point"**.
+
+#### **✅ Slack Integration**
+- Select **"Slack"** as the notification type.
+- Paste the **Slack Webhook URL**.
+- Click **"Send Test Notification"** to verify.
+---
+![](/Images/Grafana-alert.jpg)
+
+---
+
+#### **✅ Microsoft Teams Integration**
+- Select **"Webhook"** as the notification type.
+- Paste the **Microsoft Teams Webhook URL**.
+
+#### **✅ Email Notification Setup**
+- Select **"Email"** as the notification type.
+- Enter the recipient email (e.g., `security-team@company.com`).
+
+### **5️⃣ Enable Alerting & Save**
+- Click **"Save & Apply"**.
+- Ensure **alert rules are active**.
+- Generate a **test alert** by manually increasing vulnerabilities or CPU usage.
+
+### **6️⃣ Verify Alerts**
+- Check if Slack, Teams, or Email notifications are received.
+- Adjust alert thresholds to minimize false positives.
+
+
+
+
+
 
