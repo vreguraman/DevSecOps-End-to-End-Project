@@ -44,9 +44,7 @@ resource "aws_security_group" "Sample-Ecommerce-Instance-SG" {
   tags = {
     Name = "Sample-Ecommerce-Instance-SG"
   }
-   provisioner "local-exec" {
-    command = "echo ${self.public_ip} > inventory.ini"
-  }
+  
 }
 
 resource "aws_instance" "Sample-Ecommerce-Instance" {
