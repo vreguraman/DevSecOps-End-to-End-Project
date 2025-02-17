@@ -135,7 +135,7 @@ pipeline {
                     docker push $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest || { echo "Docker push failed"; exit 1; }
                     '''
                 }
-                archiveArtifacts artifacts: 'Docker/trivy-report.txt', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
             }
         }
 
