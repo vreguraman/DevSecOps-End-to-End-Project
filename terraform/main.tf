@@ -6,7 +6,7 @@ data "vault_generic_secret" "aws_credentials" {
 }
 
 provider "aws" {
-  region     = "us-east-1"
+  region     = "ap-south-1"
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
 }
