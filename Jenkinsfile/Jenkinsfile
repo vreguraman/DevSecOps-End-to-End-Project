@@ -78,11 +78,14 @@ pipeline {
                     echo "Installing dependencies..."
                     npm install || { echo "npm install failed"; exit 1; }
 
-                    echo "Running tests..."
-                    npm test || { echo "Tests failed"; exit 1; }
+                    echo "Running tests with coverage..."
+                    npm test -- --coverage || { echo "Tests failed"; exit 1; }
 
                     echo "Creating app.tar.gz artifact..."
-                    tar -czf app.tar.gz * || { echo "Failed to create artifact"; exit 1; }
+                    tar --exclude=app.tar.gz -czf app.tar.gz * || { echo "Failed to create artifact"; exit 1; }
+
+                    echo "Listing artifact contents..."
+                    tar -tf app.tar.gz || { echo "Failed to verify artifact contents"; exit 1; }
                     '''
                 }
             }
