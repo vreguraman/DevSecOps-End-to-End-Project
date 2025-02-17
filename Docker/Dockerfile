@@ -3,11 +3,11 @@ FROM node:16-alpine
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and install dependencies
+# Copy package.json from the src directory
 COPY ../src/package.json .  
 RUN npm install
 
-# Copy the source code from the src folder
+# Copy the full application source code from src
 COPY ../src .  
 
 # Expose the application port
