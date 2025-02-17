@@ -110,7 +110,7 @@ pipeline {
         // Docker Build, Scan & Push
         stage('Docker Build, Scan & Push') {
             steps {
-                dir('Docker') {
+                dir('src') {
                     sh '''
                     echo "Fetching Docker credentials from Vault..."
                     export VAULT_ADDR="${VAULT_ADDR}"
