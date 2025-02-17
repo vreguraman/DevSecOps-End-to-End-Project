@@ -907,6 +907,43 @@ vault write aws/roles/dev-role \
 }
 EOF
 ```
+## Jenkins Credentials Configuration for Vault
+
+### Steps to Store HashiCorp Vault Credentials in Jenkins
+
+###  Open Jenkins & Navigate to Credentials Management
+- Go to **Jenkins Dashboard**.
+- Click on **"Manage Jenkins"**.
+- Select **"Manage Credentials"**.
+- Under **"Stores scoped to Jenkins"**, click on **"Global credentials (unrestricted)"**.
+
+### Add Vault Address as a Secret Text Credential
+- Click **"Add Credentials"**.
+- Under **"Kind"**, select **"Secret text"**.
+- In the **"Secret"** field, paste your **Vault Address**.
+- In the **"ID"** field, enter `VAULT_ADDR`.
+- Click **"OK"** to save.
+
+### Add Vault Token as a Secret Text Credential
+- Click **"Add Credentials"** again.
+- Under **"Kind"**, select **"Secret text"**.
+- In the **"Secret"** field, paste your **Vault Token**.
+- In the **"ID"** field, enter `VAULT_TOKEN`.
+- Click **"OK"** to save.
+
+###  Verify Credentials in Jenkins
+- Go back to **"Global credentials"**.
+- Ensure **`VAULT_ADDR` and `VAULT_TOKEN`** are listed under stored credentials.
+- Use them in your Jenkins pipeline as:
+  ```groovy
+  environment {
+      VAULT_ADDR = credentials('VAULT_ADDR')
+      VAULT_TOKEN = credentials('VAULT_TOKEN')
+  }
+  ```
+
+---
+
 ### Testing HashiCorp Vault in a Freestyle Jenkins Job
 
 To verify Vault integration with Jenkins, follow these steps:
