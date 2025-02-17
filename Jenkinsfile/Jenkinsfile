@@ -98,7 +98,7 @@ pipeline {
                         -Dsonar.projectKey=Project \
                         -Dsonar.sources=src \
                         -Dsonar.host.url=http://52.66.251.62:9000/ \
-                        -Dsonar.login=sqa_ab787d1d52b8021ed2c47dc7681c5f17829195e1 || { echo "SonarQube analysis failed"; exit 1; }
+                        -Dsonar.login=sqa_6c22027d63c27dc6b4aa343136c1e112465616a8 || { echo "SonarQube analysis failed"; exit 1; }
                     '''
                 }
             }
