@@ -120,7 +120,7 @@ pipeline {
                     DOCKER_PASSWORD=$(vault kv get -field=password secret/docker) || { echo "Failed to fetch Docker password"; exit 1; }
 
                     echo "Building Docker image..."
-                    docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest -f Docker/Dockerfile . || { echo "Docker build failed"; exit 1; }
+                    docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest  . || { echo "Docker build failed"; exit 1; }
 
                     echo "Scanning Docker image with Trivy..."
                     trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest | tee trivy-report.txt || echo "Trivy scan completed with warnings."
