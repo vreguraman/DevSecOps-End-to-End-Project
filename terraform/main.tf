@@ -48,7 +48,7 @@ resource "aws_security_group" "Sample-Ecommerce-Instance-SG" {
 }
 
 resource "aws_instance" "Sample-Ecommerce-Instance" {
-  ami           = "ami-05576a079321f21f8" # Replace with your region-specific AMI
+  ami           = "ami-0ddfba243cbee3768" # Replace with your region-specific AMI
   instance_type = "t2.micro"              # Free-tier eligible instance type
   key_name   = "Devsecops"           # SSH key pair name
 
