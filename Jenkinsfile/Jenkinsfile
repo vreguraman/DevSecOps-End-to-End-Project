@@ -4,6 +4,8 @@ pipeline {
         VAULT_ADDR = credentials('VAULT_ADDR') // HashiCorp Vault address
         VAULT_TOKEN = credentials('VAULT_TOKEN') // HashiCorp Vault token
         PATH = "/opt/sonar-scanner/bin:$PATH" // Adding Sonar Scanner to PATH
+        OTEL_CONFIG = "otel-collector-config.yaml" // OpenTelemetry Collector configuration file
+        TRIVY_IMAGE = "sample-ecommerce-nodejs-app:latest" // Docker image for Trivy scan
     }
     stages {
         // Test Vault Connection
@@ -123,7 +125,10 @@ pipeline {
                     docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest  . || { echo "Docker build failed"; exit 1; }
 
                     echo "Scanning Docker image with Trivy..."
-                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest | tee trivy-report.txt || echo "Trivy scan completed with warnings."
+                    sh "trivy image --format json --severity HIGH,CRITICAL ${TRIVY_IMAGE} > trivy-results.json"
+                    sh "node generate-trivy-metrics.js"
+                    sh "mv trivy-metrics.prom metrics/"
+                    sh "python3 -m http.server 8085 &"  tee trivy-report.txt || echo "Trivy scan completed with warnings."
 
                     echo "Verifying Trivy report..."
                     ls -l trivy-report.txt || { echo "Trivy report not found"; exit 1; }
