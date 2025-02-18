@@ -71,7 +71,7 @@ pipeline {
                 dir('terraform') {
                     sh '''
                     echo "Running TFScan..."
-                    tfsec ${TERRAFORM_DIR} --format=json > tfsec-results.json || { echo "TFSec scan failed"; exit 1; }
+                    tfsec . --format=json > tfsec-results.json || { echo "TFSec scan failed"; exit 1; }
 
                     echo "Generating TFScan Metrics..."
                     node generate-tfsec-metrics.js || { echo "Failed to generate metrics"; exit 1; }
