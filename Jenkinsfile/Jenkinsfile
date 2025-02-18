@@ -122,22 +122,22 @@ pipeline {
                     DOCKER_PASSWORD=$(vault kv get -field=password secret/docker) || { echo "Failed to fetch Docker password"; exit 1; }
 
                     echo "Building Docker image..."
-                    docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest  . || { echo "Docker build failed"; exit 1; }
+                    docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest . || { echo "Docker build failed"; exit 1; }
+
+                    echo "Verifying image existence..."
+                    docker images | grep $DOCKER_USERNAME/sample-ecommerce-nodejs-app || { echo "Docker image not found"; exit 1; }
 
                     echo "Scanning Docker image with Trivy..."
-                    sh "trivy image --format json --severity HIGH,CRITICAL ${TRIVY_IMAGE} > trivy-results.json"
-                    sh "node generate-trivy-metrics.js"
-                    sh "mv trivy-metrics.prom metrics/"
-                    sh "python3 -m http.server 8085 &"  tee trivy-report.txt || echo "Trivy scan completed with warnings."
+                    trivy image --format json --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest > trivy-results.json || { echo "Trivy scan failed"; exit 1; }
 
-                    echo "Verifying Trivy report..."
-                    ls -l trivy-report.txt || { echo "Trivy report not found"; exit 1; }
+                    echo "Generating Trivy Metrics..."
+                    node generate-trivy-metrics.js || { echo "Failed to generate metrics"; exit 1; }
 
-                    echo "Logging in to Docker Hub..."
-                    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin || { echo "Docker login failed"; exit 1; }
+                    echo "Moving Trivy metrics..."
+                    mv trivy-metrics.prom metrics/ || { echo "Failed to move metrics"; exit 1; }
 
-                    echo "Pushing Docker image to Docker Hub..."
-                    docker push $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest || { echo "Docker push failed"; exit 1; }
+                    echo "Starting HTTP server for metrics..."
+                    nohup python3 -m http.server 8085 > /dev/null 2>&1 &
                     '''
                 }
                 archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
