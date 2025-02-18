@@ -80,7 +80,7 @@ pipeline {
                     mv tfsec-metrics.prom metrics || { echo "Failed to move metrics"; exit 1; }
 
                     echo "Starting HTTP server for metrics..."
-                    nohup python3 -m http.server 8086 > /dev/null 2>&1 &
+                    nohup python3 -m http.server 8086  &
                     '''
                 }
                 archiveArtifacts artifacts: 'terraform/tfscan-report.txt', allowEmptyArchive: true
@@ -125,7 +125,7 @@ pipeline {
                     mv trivy-metrics.prom metrics || { echo "Failed to move metrics"; exit 1; }
 
                     echo "Starting HTTP server for Trivy metrics..."
-                    nohup python3 -m http.server 8085 > /dev/null 2>&1 &
+                    nohup python3 -m http.server 8085 &
                     '''
                 }
                 archiveArtifacts artifacts: 'trivy-results.json', allowEmptyArchive: true
