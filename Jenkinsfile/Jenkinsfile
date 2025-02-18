@@ -125,7 +125,7 @@ pipeline {
                     mv trivy-metrics.prom metrics || { echo "Failed to move metrics"; exit 1; }
 
                     echo "Starting HTTP server for Trivy metrics..."
-                    nohup python3 -m http.server 8085 &
+                    python3 -m http.server 8085 &
                     '''
                 }
                 archiveArtifacts artifacts: 'trivy-results.json', allowEmptyArchive: true
@@ -166,7 +166,7 @@ pipeline {
                 dir('src') {
                     sh '''
                     echo "Starting Node.js application..."
-                    nohup node server.js > app.log 2>&1 &
+                    node server.js &
                     '''
                 }
             }
@@ -174,10 +174,10 @@ pipeline {
 
         stage('Start OpenTelemetry Collector') {
             steps {
-                script {
+                dir('src') {
                     sh '''
                     echo "Starting OpenTelemetry Collector..."
-                    nohup otelcol --config ${OTEL_CONFIG} > otel.log 2>&1 &
+                    otelcol --config ${OTEL_CONFIG} &
                     '''
                 }
             }
