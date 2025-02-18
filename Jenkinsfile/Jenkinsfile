@@ -1,14 +1,15 @@
 pipeline {
     agent any
     environment {
-        VAULT_ADDR = credentials('VAULT_ADDR') // HashiCorp Vault address
-        VAULT_TOKEN = credentials('VAULT_TOKEN') // HashiCorp Vault token
-        PATH = "/opt/sonar-scanner/bin:$PATH" // Adding Sonar Scanner to PATH
-        OTEL_CONFIG = "otel-collector-config.yaml" // OpenTelemetry Collector configuration file
-        TRIVY_IMAGE = "sample-ecommerce-nodejs-app:latest" // Docker image for Trivy scan
+        VAULT_ADDR = credentials('VAULT_ADDR')
+        VAULT_TOKEN = credentials('VAULT_TOKEN')
+        PATH = "/opt/sonar-scanner/bin:$PATH"
+        OTEL_CONFIG = "otel-collector-config.yaml"
+        TRIVY_IMAGE = "sample-ecommerce-nodejs-app:latest"
+        TERRAFORM_DIR = "terraform/"
     }
     stages {
-        // Test Vault Connection
+        
         stage('Test Vault') {
             steps {
                 sh '''
@@ -17,29 +18,68 @@ pipeline {
                 export VAULT_TOKEN="${VAULT_TOKEN}"
 
                 vault read -format=json aws/creds/dev-role > aws_creds.json || { echo "Vault read failed"; exit 1; }
-                jq -r '.data.access_key' aws_creds.json > access_key.txt || { echo "Failed to extract access key"; exit 1; }
-                jq -r '.data.secret_key' aws_creds.json > secret_key.txt || { echo "Failed to extract secret key"; exit 1; }
+                jq -r '.data.access_key' aws_creds.json > access_key.txt
+                jq -r '.data.secret_key' aws_creds.json > secret_key.txt
                 '''
             }
         }
 
-        // Terraform Security Scan (TFScan)
-        stage('TFScan') {
+        stage('Run Node.js Tests') {
+            steps {
+                dir('src') {
+                    sh '''
+                    echo "Running Node.js tests..."
+                    npm install || { echo "npm install failed"; exit 1; }
+                    npm test -- --coverage || { echo "Tests failed"; exit 1; }
+                    '''
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                    echo "Running SonarQube Analysis..."
+                    sonar-scanner -Dsonar.projectKey=Project -Dsonar.sources=src -Dsonar.host.url=http://52.66.251.62:9000/
+                    '''
+                }
+            }
+        }
+
+        stage('Snyk Security Scan') {
+            steps {
+                dir('src') {
+                    sh '''
+                    echo "Running Snyk Security Scan..."
+                    snyk test --json > snyk-results.json || echo "Snyk scan completed with warnings."
+                    '''
+                }
+                archiveArtifacts artifacts: 'src/snyk-results.json', allowEmptyArchive: true
+            }
+        }
+
+        stage('TFScan & Metrics') {
             steps {
                 dir('terraform') {
                     sh '''
                     echo "Running TFScan..."
-                    tfsec . | tee tfscan-report.txt || echo "TFScan completed with warnings."
+                    tfsec ${TERRAFORM_DIR} --format=json > tfsec-results.json || { echo "TFSec scan failed"; exit 1; }
 
-                    echo "Verifying TFScan report..."
-                    ls -l tfscan-report.txt || { echo "TFScan report not found"; exit 1; }
+                    echo "Generating TFScan Metrics..."
+                    node generate-tfsec-metrics.js || { echo "Failed to generate metrics"; exit 1; }
+
+                    echo "Moving TFsec metrics..."
+                    mv tfsec-metrics.prom metrics || { echo "Failed to move metrics"; exit 1; }
+
+                    echo "Starting HTTP server for metrics..."
+                    nohup python3 -m http.server 8086 > /dev/null 2>&1 &
                     '''
                 }
                 archiveArtifacts artifacts: 'terraform/tfscan-report.txt', allowEmptyArchive: true
             }
         }
 
-        // Terraform Plan
         stage('Terraform Plan') {
             steps {
                 dir('terraform') {
@@ -48,69 +88,13 @@ pipeline {
                     terraform init || { echo "Terraform init failed"; exit 1; }
 
                     echo "Planning Terraform changes..."
-                    terraform plan \
-                        -out=tfplan \
-                        -var="aws_access_key=$(cat ../access_key.txt)" \
-                        -var="aws_secret_key=$(cat ../secret_key.txt)" | tee terraform-plan.txt || { echo "Terraform plan failed"; exit 1; }
+                    terraform plan -out=tfplan -var="aws_access_key=$(cat ../access_key.txt)" -var="aws_secret_key=$(cat ../secret_key.txt)"
                     '''
                 }
             }
         }
 
-        // Terraform Apply
-        stage('Terraform Apply') {
-            steps {
-                dir('terraform') {
-                    sh '''
-                    echo "Applying Terraform changes..."
-                    terraform apply -auto-approve tfplan || { echo "Terraform apply failed"; exit 1; }
-                    '''
-                }
-            }
-        }
-
-        // Run Node.js Tests
-        stage('Run Node.js Tests') {
-            steps {
-                dir('src') {
-                    sh '''
-                    echo "Cleaning up existing node_modules..."
-                    rm -rf node_modules package-lock.json
-
-                    echo "Installing dependencies..."
-                    npm install || { echo "npm install failed"; exit 1; }
-
-                    echo "Running tests with coverage..."
-                    npm test -- --coverage || { echo "Tests failed"; exit 1; }
-
-                    echo "Creating app.tar.gz artifact..."
-                    tar --exclude=app.tar.gz -czf app.tar.gz * || { echo "Failed to create artifact"; exit 1; }
-
-                    echo "Listing artifact contents..."
-                    tar -tf app.tar.gz || { echo "Failed to verify artifact contents"; exit 1; }
-                    '''
-                }
-            }
-        }
-
-        // SonarQube Analysis
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                    echo "Running SonarQube Analysis..."
-                    sonar-scanner \
-                        -Dsonar.projectKey=Project \
-                        -Dsonar.sources=src \
-                        -Dsonar.host.url=http://52.66.251.62:9000/ \
-                        -Dsonar.login=sqa_6c22027d63c27dc6b4aa343136c1e112465616a8 || { echo "SonarQube analysis failed"; exit 1; }
-                    '''
-                }
-            }
-        }
-
-        // Docker Build, Scan & Push
-        stage('Docker Build, Scan & Push') {
+        stage('Docker Build & Trivy Scan with Metrics') {
             steps {
                 dir('src') {
                     sh '''
@@ -118,17 +102,14 @@ pipeline {
                     export VAULT_ADDR="${VAULT_ADDR}"
                     export VAULT_TOKEN="${VAULT_TOKEN}"
 
-                    DOCKER_USERNAME=$(vault kv get -field=username secret/docker) || { echo "Failed to fetch Docker username"; exit 1; }
-                    DOCKER_PASSWORD=$(vault kv get -field=password secret/docker) || { echo "Failed to fetch Docker password"; exit 1; }
+                    DOCKER_USERNAME=$(vault kv get -field=username secret/docker)
+                    DOCKER_PASSWORD=$(vault kv get -field=password secret/docker)
 
                     echo "Building Docker image..."
                     docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest . || { echo "Docker build failed"; exit 1; }
 
-                    echo "Verifying image existence..."
-                    docker images | grep $DOCKER_USERNAME/sample-ecommerce-nodejs-app || { echo "Docker image not found"; exit 1; }
-
                     echo "Scanning Docker image with Trivy..."
-                    trivy image --format json --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest > trivy-results.json || { echo "Trivy scan failed"; exit 1; }
+                    trivy image --format json --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest > trivy-results.json
 
                     echo "Generating Trivy Metrics..."
                     node generate-trivy-metrics.js || { echo "Failed to generate metrics"; exit 1; }
@@ -136,54 +117,65 @@ pipeline {
                     echo "Moving Trivy metrics..."
                     mv trivy-metrics.prom metrics || { echo "Failed to move metrics"; exit 1; }
 
-                    echo "Starting HTTP server for metrics..."
+                    echo "Starting HTTP server for Trivy metrics..."
                     nohup python3 -m http.server 8085 > /dev/null 2>&1 &
                     '''
                 }
-                archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'trivy-results.json', allowEmptyArchive: true
             }
         }
 
-        // Nexus Integration
         stage('Nexus Integration') {
             steps {
                 sh '''
                 echo "Fetching Nexus credentials from Vault..."
-
                 export VAULT_ADDR="${VAULT_ADDR}"
                 export VAULT_TOKEN="${VAULT_TOKEN}"
 
-                NEXUS_USERNAME=$(vault kv get -field=username nexus/credentials) || { echo "Failed to fetch Nexus username"; exit 1; }
-                NEXUS_PASSWORD=$(vault kv get -field=password nexus/credentials) || { echo "Failed to fetch Nexus password"; exit 1; }
-                NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials) || { echo "Failed to fetch Nexus repo URL"; exit 1; }
+                NEXUS_USERNAME=$(vault kv get -field=username nexus/credentials)
+                NEXUS_PASSWORD=$(vault kv get -field=password nexus/credentials)
+                NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials)
 
-                echo "Uploading Node.js application archive to Nexus..."
-                ARTIFACT=src/app.tar.gz
-                tar -czf $ARTIFACT src/ || { echo "Failed to create artifact"; exit 1; }
-
-                curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD \
-                    --upload-file $ARTIFACT \
-                    $NEXUS_REPO_URL/repository/nodejs-app/ || { echo "Failed to upload artifact to Nexus"; exit 1; }
+                echo "Uploading Node.js app to Nexus..."
+                tar -czf src/app.tar.gz src/
+                curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file src/app.tar.gz $NEXUS_REPO_URL/repository/nodejs-app/
                 '''
             }
         }
 
-        // Snyk Security Scan
-        stage('Snyk Security Scan') {
+        stage('Terraform Apply') {
             steps {
-                dir('src') {
+                dir('terraform') {
                     sh '''
-                    echo "Running Snyk Security Scan..."
-                    snyk test --json > snyk-results.json || echo "Snyk scan completed with warnings."
-                    echo "Verifying Snyk report..."
-                    ls -l snyk-results.json || { echo "Snyk report not found"; exit 1; }
+                    echo "Applying Terraform changes..."
+                    terraform apply -auto-approve tfplan
                     '''
                 }
-                archiveArtifacts artifacts: 'src/snyk-results.json', allowEmptyArchive: true
             }
         }
 
-        // Send Slack Notification
+        stage('Deploy & Monitor Application') {
+            steps {
+                dir('src') {
+                    sh '''
+                    echo "Starting Node.js application..."
+                    nohup node server.js > app.log 2>&1 &
+                    '''
+                }
+            }
+        }
+
+        stage('Start OpenTelemetry Collector') {
+            steps {
+                script {
+                    sh '''
+                    echo "Starting OpenTelemetry Collector..."
+                    nohup otelcol --config ${OTEL_CONFIG} > otel.log 2>&1 &
+                    '''
+                }
+            }
+        }
+
         stage('Send Slack Notification') {
             steps {
                 script {
