@@ -134,7 +134,7 @@ pipeline {
                     node generate-trivy-metrics.js || { echo "Failed to generate metrics"; exit 1; }
 
                     echo "Moving Trivy metrics..."
-                    mv trivy-metrics.prom metrics/ || { echo "Failed to move metrics"; exit 1; }
+                    mv trivy-metrics.prom metrics || { echo "Failed to move metrics"; exit 1; }
 
                     echo "Starting HTTP server for metrics..."
                     nohup python3 -m http.server 8085 > /dev/null 2>&1 &
