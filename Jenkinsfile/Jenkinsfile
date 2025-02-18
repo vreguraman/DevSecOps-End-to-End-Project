@@ -38,11 +38,16 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                    echo "Running SonarQube Analysis..."
-                    sonar-scanner -Dsonar.projectKey=Project -Dsonar.sources=src -Dsonar.host.url=http://52.66.251.62:9000/
-                    '''
+                script {
+                    withSonarQubeEnv('SonarQube') {
+                        sh '''
+                        echo "Running SonarQube Analysis..."
+                        sonar-scanner \
+                            -Dsonar.projectKey=Project \
+                            -Dsonar.sources=src \
+                            -Dsonar.host.url=http://52.66.251.62:9000/ \
+                            -Dsonar.login=sqa_6c22027d63c27dc6b4aa343136c1e112465616a8 | tee sonar-report.txt
+                        '''
                 }
             }
         }
