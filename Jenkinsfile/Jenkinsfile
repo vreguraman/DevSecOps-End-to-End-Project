@@ -168,6 +168,9 @@ pipeline {
             dir('ansible') {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ANSIBLE_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
                     sh '''
+                    echo "Fixing SSH key permissions..."
+                    chmod 400 ${SSH_KEY_PATH}
+                    
                     echo "Running Ansible Playbook to configure the server..."
 
                     # Ensure inventory file exists
