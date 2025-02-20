@@ -149,6 +149,11 @@ pipeline {
 
                         echo "Fetching Public IP from Terraform output..."
                         PUBLIC_IP=$(terraform output -json public_ips | jq -r '.[0]')
+                        if [ -z "$PUBLIC_IP" ]; then
+                            echo "Error: Terraform did not return a public IP!"
+                            exit 1
+                        fi
+                        echo "Public IP: ${PUBLIC_IP}"
 
                         echo "Storing Public IP in Ansible inventory..."
                         mkdir -p ../ansible
