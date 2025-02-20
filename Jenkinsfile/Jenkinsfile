@@ -114,13 +114,14 @@ pipeline {
         stage('Trivy scan') {
             steps {
                 dir('src') {
-                sh '''
-                echo "Scanning Docker image with Trivy..."
-                trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest > trivy-results.json
-                '''
-                echo "Archiving Trivy scan results..."
-                archiveArtifacts artifacts: 'trivy-results.json', allowEmptyArchive: true
-            }
+                    sh '''
+                    echo "Scanning Docker image with Trivy..."
+                    trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest > trivy-results.json
+                    '''
+                    echo "Archiving Trivy scan results..."
+                    archiveArtifacts artifacts: 'trivy-results.json', allowEmptyArchive: true
+                }
+            }    
         }
 
         stage('Nexus Integration') {
