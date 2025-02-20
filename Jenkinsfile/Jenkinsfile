@@ -186,10 +186,11 @@ pipeline {
                         exit 1
                     fi
 
-                    # Run Ansible Playbook
+                    echo "Running Ansible Playbook to configure the server..."
                     ansible-playbook -i inventory.ini playbook.yml \
-                        --private-key ${SSH_KEY_PATH} \
-                        --user ec2-user || { echo "Ansible Playbook execution failed!"; exit 1; }
+                    --private-key=/tmp/ansible_ssh_key.pem \
+                    --user ec2-user \
+                    -vvv || { echo "Ansible Playbook execution failed!"; exit 1; }
 
                     echo "Ansible Playbook executed successfully."
                     '''
