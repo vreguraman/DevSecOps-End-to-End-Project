@@ -116,32 +116,19 @@ pipeline {
         stage('Nexus Integration') {
             steps {
                 sh '''
-                    echo "Fetching Nexus credentials from Vault..."
-                    export VAULT_ADDR=${VAULT_ADDR}
-                    export VAULT_TOKEN=${VAULT_TOKEN}
+                echo "Fetching Nexus credentials from Vault..."
+                export VAULT_ADDR="${VAULT_ADDR}"
+                export VAULT_TOKEN="${VAULT_TOKEN}"
 
-                    # Fetch credentials from Vault
-                    export NEXUS_USERNAME=$(vault kv get -field=username nexus/credentials)
-                    export NEXUS_PASSWORD=$(vault kv get -field=password nexus/credentials)
-                    export NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials)
+                NEXUS_USERNAME=$(vault kv get -field=username nexus/credentials)
+                NEXUS_PASSWORD=$(vault kv get -field=password nexus/credentials)
+                NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials)
 
-                    echo "Uploading Node.js application archive to Nexus..."
+                echo "Uploading Node.js app to Nexus..."
+                tar -czf src/app.tar.gz src/
+                curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file src/app.tar.gz $NEXUS_REPO_URL/repository/nodejs-app/
+                '''  
 
-                     # Ensure the previous archive is deleted before creating a new one
-                    rm -f src/app.tar.gz
-
-                    echo "Creating tar archive, excluding node_modules..."
-                    tar --warning=no-file-changed --exclude=src/node_modules -czf src/app.tar.gz src/ || { echo "Failed to create tar archive"; exit 1; }
-                    
-                    ARTIFACT=src/app.tar.gz
-                    tar -czf $ARTIFACT src/
-
-                    curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD \
-                        --upload-file $ARTIFACT \
-                        $NEXUS_REPO_URL/repository/nodejs-app/
-
-                    echo "Artifact uploaded successfully to Nexus."
-                    '''
             }
         }
 
