@@ -140,7 +140,7 @@ pipeline {
                         terraform apply -auto-approve tfplan
 
                         echo "Fetching Public IP from Terraform output..."
-                        PUBLIC_IP=$(terraform output -raw public_ip)
+                        PUBLIC_IP=$(terraform output -json public_ips | jq -r '.[0]')
 
                         echo "Storing Public IP in Ansible inventory..."
                         mkdir -p ../ansible
