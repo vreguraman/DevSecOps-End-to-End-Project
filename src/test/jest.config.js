@@ -1,6 +1,6 @@
 module.exports = {
   testEnvironment: 'node',
-  collectCoverage: true, // Enables code coverage report
+  collectCoverage: false, // Disables code coverage report
   coverageDirectory: "./coverage", // Specifies output directory for coverage reports
   coverageReporters: ["json", "lcov", "text", "clover"], // Generates multiple coverage formats
   testPathIgnorePatterns: ["/node_modules/", "/dist/"], // Exclude unnecessary folders
