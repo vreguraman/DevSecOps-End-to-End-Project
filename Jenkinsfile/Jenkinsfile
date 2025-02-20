@@ -177,10 +177,25 @@ pipeline {
                     chmod 777 /tmp/ansible/ansible_ssh_key.pem
                     cp ${SSH_KEY_PATH} /tmp/ansible/ansible_ssh_key.pem
                     
+                    echo "Verifying inventory file from Terraform Apply stage..."
+                    if [ ! -f "../ansible/inventory.ini" ]; then
+                        echo "Error: inventory.ini not found! Terraform Apply may have failed."
+                        exit 1
+                    fi
+                    cp ../ansible/inventory.ini inventory.ini
+                    cat inventory.ini
 
-                    echo "Updating inventory file with correct SSH key path..."
-                    echo "[webserver]" > inventory.ini
-                    echo "${PUBLIC_IP} ansible_user=ec2-user ansible_ssh_private_key_file=/tmp/ansible/ansible_ssh_key.pem" >> inventory.ini
+                    # Extract the first IP from inventory file
+                    PUBLIC_IP=$(awk 'NR==2 {print $1}' inventory.ini)
+                    if [ -z "$PUBLIC_IP" ]; then
+                        echo "Error: No public IP found in inventory.ini!"
+                        exit 1
+                    fi
+                    echo "Public IP from inventory.ini: $PUBLIC_IP"
+
+                    // echo "Updating inventory file with correct SSH key path..."
+                    // echo "[webserver]" > inventory.ini
+                    // echo "${PUBLIC_IP} ansible_user=ec2-user ansible_ssh_private_key_file=/tmp/ansible/ansible_ssh_key.pem" >> inventory.ini
 
                     echo "Disabling SSH host key checking..."
                     export ANSIBLE_HOST_KEY_CHECKING=False
