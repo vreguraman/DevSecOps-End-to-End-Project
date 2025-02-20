@@ -178,11 +178,10 @@ pipeline {
                     chmod 400 /tmp/ansible/ansible_ssh_key.pem
 
                     echo "Verifying inventory file from Terraform Apply stage..."
-                    if [ ! -f "../ansible/inventory.ini" ]; then
+                    if [ ! -f "inventory.ini" ]; then
                         echo "Error: inventory.ini not found! Terraform Apply may have failed."
                         exit 1
                     fi
-                    cp ../ansible/inventory.ini inventory.ini
                     cat inventory.ini
 
                     # Extract the first IP from inventory file
