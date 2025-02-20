@@ -173,8 +173,9 @@ pipeline {
 
                     echo "Copying SSH Key to a Safe Location..."
                     mkdir -p /tmp/ansible
+                    chmod 777 /tmp/ansible/ansible_ssh_key.pem
                     cp ${SSH_KEY_PATH} /tmp/ansible/ansible_ssh_key.pem
-                    chmod 400 /tmp/ansible/ansible_ssh_key.pem
+                    
 
                     echo "Updating inventory file with correct SSH key path..."
                     echo "[webserver]" > inventory.ini
