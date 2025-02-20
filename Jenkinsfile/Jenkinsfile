@@ -149,16 +149,12 @@ pipeline {
 
                         echo "Fetching Public IP from Terraform output..."
                         PUBLIC_IP=$(terraform output -json public_ips | jq -r '.[0]')
-                        if [ -z "$PUBLIC_IP" ]; then
-                            echo "Error: Terraform did not return a public IP!"
-                            exit 1
-                        fi
                         echo "Public IP: ${PUBLIC_IP}"
 
                         echo "Storing Public IP in Ansible inventory..."
                         mkdir -p ../ansible
                         echo "[webserver]" > ../ansible/inventory.ini
-                        echo "13.233.117.98 ansible_user=ec2-user ansible_ssh_private_key_file=/tmp/ansible/ansible_ssh_key.pem" >> inventory.ini
+                        echo "${PUBLIC_IP} ansible_user=ec2-user ansible_ssh_private_key_file=${SSH_KEY_PATH}" >> ../ansible/inventory.ini
 
                         echo "Verifying inventory file..."
                         cat ../ansible/inventory.ini
