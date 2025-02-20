@@ -149,7 +149,6 @@ pipeline {
 
                         echo "Fetching Public IP from Terraform output..."
                         PUBLIC_IP=$(terraform output -json public_ips | jq -r '.[0]')
-                        echo "Public IP: ${PUBLIC_IP}"
 
                         echo "Storing Public IP in Ansible inventory..."
                         mkdir -p ../ansible
@@ -177,12 +176,9 @@ pipeline {
                     cp ${SSH_KEY_PATH} /tmp/ansible/ansible_ssh_key.pem
                     chmod 400 /tmp/ansible/ansible_ssh_key.pem
 
-                    echo "Verifying inventory file..."
-                    cat inventory.ini || { echo "Error: inventory.ini not found!"; exit 1; }
-
-                    // echo "Updating inventory file with correct SSH key path..."
-                    // echo "[webserver]" > inventory.ini
-                    // echo "${PUBLIC_IP} ansible_user=ec2-user ansible_ssh_private_key_file=/tmp/ansible/ansible_ssh_key.pem" >> inventory.ini
+                    echo "Updating inventory file with correct SSH key path..."
+                    echo "[webserver]" > inventory.ini
+                    echo "$(terraform output -raw public_ip) ansible_user=ec2-user ansible_ssh_private_key_file=/tmp/ansible/ansible_ssh_key.pem" >> inventory.ini
 
                     echo "Disabling SSH host key checking..."
                     export ANSIBLE_HOST_KEY_CHECKING=False
