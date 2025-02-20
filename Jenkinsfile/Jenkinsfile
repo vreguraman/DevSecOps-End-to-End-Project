@@ -165,7 +165,7 @@ pipeline {
 
     stage('Run Ansible Playbook') {
         steps {
-            dir('Ansible') {
+            dir('ansible') {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ANSIBLE_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
                     sh '''
                     echo "Running Ansible Playbook to configure the server..."
