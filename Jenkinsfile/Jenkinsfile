@@ -125,6 +125,10 @@ pipeline {
                 NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials)
 
                 echo "Uploading Node.js app to Nexus..."
+
+                # Ensure the previous archive is deleted before creating a new one
+                rm -f src/app.tar.gz
+                
                 tar -czf src/app.tar.gz src/
                 curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file src/app.tar.gz $NEXUS_REPO_URL/repository/nodejs-app/
                 '''
