@@ -4,7 +4,6 @@ pipeline {
         VAULT_ADDR = credentials('VAULT_ADDR')
         VAULT_TOKEN = credentials('VAULT_TOKEN')
         PATH = "/opt/sonar-scanner/bin:$PATH"
-        OTEL_CONFIG = "otel-collector-config.yaml"
         TRIVY_IMAGE = "sample-ecommerce-nodejs-app:latest"
         TERRAFORM_DIR = "terraform/"
     }
@@ -45,7 +44,7 @@ pipeline {
                         sonar-scanner \
                             -Dsonar.projectKey=Project \
                             -Dsonar.sources=src \
-                            -Dsonar.host.url=http://52.66.251.62:9000/ \
+                            -Dsonar.host.url=http://13.201.137.168:9000/ \
                             -Dsonar.login=sqa_6c22027d63c27dc6b4aa343136c1e112465616a8 | tee sonar-report.txt
                            '''
                     }      
@@ -71,23 +70,14 @@ pipeline {
                 dir('terraform') {
                     sh '''
                     echo "Running TFScan..."
-                    tfsec . --format=json > tfsec-results.json || { echo "TFSec scan failed"; exit 1; }
-
-                    echo "Generating TFScan Metrics..."
-                    node generate-tfsec-metrics.js || { echo "Failed to generate metrics"; exit 1; }
-
-                    echo "Moving TFsec metrics..."
-                    mv tfsec-metrics.prom metrics || { echo "Failed to move metrics"; exit 1; }
-
-                    echo "Starting HTTP server for metrics..."
-                    nohup python3 -m http.server 8086  &
+                    tfsec . > tfsec-results.json || { echo "TFSec scan failed"; exit 1; }
                     '''
                 }
                 archiveArtifacts artifacts: 'terraform/tfscan-report.txt', allowEmptyArchive: true
             }
         }
 
-        stage('Terraform Plan') {
+        stage('Terraform init & Plan') {
             steps {
                 dir('terraform') {
                     sh '''
@@ -101,7 +91,7 @@ pipeline {
             }
         }
 
-        stage('Docker Build & Trivy Scan with Metrics') {
+        stage('Docker Build') {
             steps {
                 dir('src') {
                     sh '''
@@ -114,22 +104,20 @@ pipeline {
 
                     echo "Building Docker image..."
                     docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest . || { echo "Docker build failed"; exit 1; }
-
-                    echo "Scanning Docker image with Trivy..."
-                    trivy image --format json --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest > trivy-results.json
-
-                    echo "Generating Trivy Metrics..."
-                    node generate-trivy-metrics.js || { echo "Failed to generate metrics"; exit 1; }
-
-                    echo "Moving Trivy metrics..."
-                    mv trivy-metrics.prom metrics || { echo "Failed to move metrics"; exit 1; }
-
-                    echo "Starting HTTP server for Trivy metrics..."
-                    python3 -m http.server 8085 &
                     '''
                 }
                 archiveArtifacts artifacts: 'trivy-results.json', allowEmptyArchive: true
             }
+        }
+
+        stage('Trivy scan') {
+            steps {
+                sh '''
+                echo "Scanning Docker image with Trivy..."
+                trivy image --severity HIGH,CRITICAL $TRIVY_IMAGE > trivy-results.json
+                '''
+            }
+            archiveArtifacts artifacts: 'trivy-results.json', allowEmptyArchive: true
         }
 
         stage('Nexus Integration') {
@@ -153,35 +141,37 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
-                    sh '''
-                    echo "Applying Terraform changes..."
-                    terraform apply -auto-approve tfplan
-                    '''
+                     withCredentials([sshUserPrivateKey(credentialsId: 'ANSIBLE_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
+                        sh '''
+                        echo "Applying Terraform changes..."
+                        terraform apply -auto-approve tfplan
+
+                        echo "Fetching Public IP from Terraform output..."
+                        PUBLIC_IP=$(terraform output -raw public_ip)
+
+                        echo "Storing Public IP in Ansible inventory..."
+                        mkdir -p ../ansible
+                        echo "[webserver]" > ../ansible/inventory.ini
+                        echo "${PUBLIC_IP} ansible_user=ec2-user ansible_ssh_private_key_file=${SSH_KEY_PATH}" >> ../ansible/inventory.ini
+
+                        echo "Verifying inventory file..."
+                        cat ../ansible/inventory.ini
+                        '''
+                    }    
                 }
             }
         }
 
-        stage('Deploy & Monitor Application') {
-            steps {
-                dir('src') {
-                    sh '''
-                    echo "Starting Node.js application..."
-                    node server.js &
-                    '''
-                }
-            }
-        }
-
-        stage('Start OpenTelemetry Collector') {
-            steps {
-                dir('src') {
-                    sh '''
-                    echo "Starting OpenTelemetry Collector..."
-                    otelcol --config ${OTEL_CONFIG} &
-                    '''
-                }
-            }
-        }
+        // stage('Deploy & Monitor Application') {
+        //     steps {
+        //         dir('src') {
+        //             sh '''
+        //             echo "Starting Node.js application..."
+        //             node server.js &
+        //             '''
+        //         }
+        //     }
+        // }
 
         stage('Send Slack Notification') {
             steps {
