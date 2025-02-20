@@ -172,12 +172,12 @@ pipeline {
                     echo "Fixing SSH key permissions..."
                     chmod 400 ${SSH_KEY_PATH}
 
-                    echo "Copying SSH Key to a Safe Location..."
-                    mkdir -p /tmp/ansible
-                    cp ${SSH_KEY_PATH} /tmp/ansible/ansible_ssh_key.pem
-                    chmod 400 /tmp/ansible/ansible_ssh_key.pem
+                    echo "Copying SSH Key to a Safe Location in Jenkins Workspace..."
+                    mkdir -p $WORKSPACE/ansible
+                    cp ${SSH_KEY_PATH} $WORKSPACE/ansible/ansible_ssh_key.pem
+                    chmod 400 $WORKSPACE/ansible/ansible_ssh_key.pem
 
-                    echo "Verifying inventory file from Terraform Apply stage..."
+                    echo "Verifying inventory file..."
                     if [ ! -f "inventory.ini" ]; then
                         echo "Error: inventory.ini not found! Terraform Apply may have failed."
                         exit 1
@@ -203,7 +203,7 @@ pipeline {
 
                     echo "Running Ansible Playbook..."
                     ansible-playbook -i inventory.ini playbook.yml \
-                        --private-key=/tmp/ansible/ansible_ssh_key.pem \
+                        --private-key=$WORKSPACE/ansible/ansible_ssh_key.pem \
                         --user ec2-user -vvv || { echo "Ansible Playbook execution failed!"; exit 1; }
 
                     echo "Ansible Playbook executed successfully."
