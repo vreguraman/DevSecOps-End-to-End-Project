@@ -170,6 +170,9 @@ pipeline {
                     sh '''
                     echo "Fixing SSH key permissions..."
                     chmod 400 ${SSH_KEY_PATH}
+
+                    echo "Disabling SSH host key checking..."
+                    export ANSIBLE_HOST_KEY_CHECKING=False
                     
                     echo "Running Ansible Playbook to configure the server..."
 
