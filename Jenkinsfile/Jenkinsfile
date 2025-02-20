@@ -172,8 +172,9 @@ pipeline {
                     chmod 400 ${SSH_KEY_PATH}
 
                     echo "Copying SSH Key to a Safe Location..."
-                    cp ${SSH_KEY_PATH} /tmp/ansible_ssh_key.pem
-                    chmod 400 /tmp/ansible_ssh_key.pem
+                    mkdir -p ~/.ssh
+                    cp ${SSH_KEY_PATH} ~/.ssh/ansible_ssh_key.pem
+                    chmod 400 ~/.ssh/ansible_ssh_key.pem
 
                     echo "Disabling SSH host key checking..."
                     export ANSIBLE_HOST_KEY_CHECKING=False
