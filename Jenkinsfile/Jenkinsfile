@@ -4,7 +4,6 @@ pipeline {
         VAULT_ADDR = credentials('VAULT_ADDR')
         VAULT_TOKEN = credentials('VAULT_TOKEN')
         PATH = "/opt/sonar-scanner/bin:$PATH"
-        TRIVY_IMAGE = "sample-ecommerce-nodejs-app:latest"
         TERRAFORM_DIR = "terraform/"
     }
     stages {
@@ -113,7 +112,7 @@ pipeline {
             steps {
                 sh '''
                 echo "Scanning Docker image with Trivy..."
-                trivy image --severity HIGH,CRITICAL $TRIVY_IMAGE > trivy-results.json
+                trivy image --severity HIGH,CRITICAL sample-ecommerce-nodejs-app:latest > trivy-results.json
                 '''
                 echo "Archiving Trivy scan results..."
                 archiveArtifacts artifacts: 'trivy-results.json', allowEmptyArchive: true
