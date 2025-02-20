@@ -208,7 +208,7 @@ pipeline {
                     echo "Running Ansible Playbook..."
                     ansible-playbook -i inventory.ini playbook.yml \
                         --private-key=$WORKSPACE/ansible/ansible_ssh_key.pem \
-                        --user ec2-user -vvv || { echo "Ansible Playbook execution failed!"; exit 1; }
+                        --user ec2-user  || { echo "Ansible Playbook execution failed!"; exit 1; }
 
                     echo "Ansible Playbook executed successfully."
                     '''
