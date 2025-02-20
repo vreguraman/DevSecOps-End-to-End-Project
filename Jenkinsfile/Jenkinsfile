@@ -28,7 +28,7 @@ pipeline {
                     sh '''
                     echo "Running Node.js tests..."
                     npm install || { echo "npm install failed"; exit 1; }
-                    npm test || { echo "Tests failed"; exit 1; }
+                    npm test -- --coverage || { echo "Tests failed"; exit 1; }
                     '''
                 }
             }
@@ -126,9 +126,6 @@ pipeline {
 
                 echo "Uploading Node.js app to Nexus..."
 
-                # Ensure the previous archive is deleted before creating a new one
-                rm -f src/app.tar.gz
-                
                 tar -czf src/app.tar.gz src/
                 curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file src/app.tar.gz $NEXUS_REPO_URL/repository/nodejs-app/
                 '''
