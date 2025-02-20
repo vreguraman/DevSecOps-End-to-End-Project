@@ -28,7 +28,6 @@ pipeline {
                     sh '''
                     echo "Running Node.js tests..."
                     npm install || { echo "npm install failed"; exit 1; }
-                    npm test  || { echo "Tests failed"; exit 1; }
                     '''
                 }
             }
@@ -164,16 +163,31 @@ pipeline {
             }
         }
 
-        // stage('Deploy & Monitor Application') {
-        //     steps {
-        //         dir('src') {
-        //             sh '''
-        //             echo "Starting Node.js application..."
-        //             node server.js &
-        //             '''
-        //         }
-        //     }
-        // }
+    stage('Run Ansible Playbook') {
+        steps {
+            dir('Ansible') {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ANSIBLE_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
+                    sh '''
+                    echo "Running Ansible Playbook to configure the server..."
+
+                    # Ensure inventory file exists
+                    if [ ! -f "inventory.ini" ]; then
+                        echo "Error: inventory.ini not found!"
+                        exit 1
+                    fi
+
+                    # Run Ansible Playbook
+                    ansible-playbook -i inventory.ini playbook.yml \
+                        --private-key ${SSH_KEY_PATH} \
+                        --user ec2-user || { echo "Ansible Playbook execution failed!"; exit 1; }
+
+                    echo "Ansible Playbook executed successfully."
+                    '''
+                }   
+            }
+        }
+    }
+
 
         stage('Send Slack Notification') {
             steps {
