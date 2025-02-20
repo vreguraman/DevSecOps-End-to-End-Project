@@ -126,6 +126,13 @@ pipeline {
                     export NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials)
 
                     echo "Uploading Node.js application archive to Nexus..."
+
+                     # Ensure the previous archive is deleted before creating a new one
+                    rm -f src/app.tar.gz
+
+                    echo "Creating tar archive, excluding node_modules..."
+                    tar --warning=no-file-changed --exclude=src/node_modules -czf src/app.tar.gz src/ || { echo "Failed to create tar archive"; exit 1; }
+                    
                     ARTIFACT=src/app.tar.gz
                     tar -czf $ARTIFACT src/
 
