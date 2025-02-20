@@ -103,6 +103,9 @@ pipeline {
 
                     echo "Building Docker image..."
                     docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest . || { echo "Docker build failed"; exit 1; }
+
+                    echo "Verifying Docker image exists..."
+                    docker image inspect $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest || { echo "Docker image not found!"; exit 1; }
                     '''
                 }
             }
@@ -110,6 +113,7 @@ pipeline {
 
         stage('Trivy scan') {
             steps {
+                dir('src') {
                 sh '''
                 echo "Scanning Docker image with Trivy..."
                 trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest > trivy-results.json
