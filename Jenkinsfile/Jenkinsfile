@@ -180,7 +180,7 @@ pipeline {
 
                     echo "Updating inventory file with correct SSH key path..."
                     echo "[webserver]" > inventory.ini
-                    echo "${terraform output -json public_ips} ansible_user=ec2-user ansible_ssh_private_key_file=/tmp/ansible/ansible_ssh_key.pem" >> inventory.ini
+                    echo "${PUBLIC_IP} ansible_user=ec2-user ansible_ssh_private_key_file=/tmp/ansible/ansible_ssh_key.pem" >> inventory.ini
 
                     echo "Disabling SSH host key checking..."
                     export ANSIBLE_HOST_KEY_CHECKING=False
