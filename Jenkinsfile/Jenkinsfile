@@ -113,24 +113,32 @@ pipeline {
             }
         }
 
-        stage('Nexus Integration') {
-            steps {
+    stage('Nexus Integration') {
+        steps {
+            script {
+                echo 'Fetching Nexus credentials from Vault...'
+                // Fetch credentials from Vault
+                NEXUS_USERNAME = sh(script: 'vault kv get -field=username nexus/credentials', returnStdout: true).trim()
+                NEXUS_PASSWORD = sh(script: 'vault kv get -field=password nexus/credentials', returnStdout: true).trim()
+                NEXUS_REPO_URL = sh(script: 'vault kv get -field=repo_url nexus/credentials', returnStdout: true).trim()
+
+                echo 'Uploading Node.js app to Nexus...'
+                // Create a temporary directory for the archive
                 sh '''
-                echo "Fetching Nexus credentials from Vault..."
-                export VAULT_ADDR="${VAULT_ADDR}"
-                export VAULT_TOKEN="${VAULT_TOKEN}"
-
-                NEXUS_USERNAME=$(vault kv get -field=username nexus/credentials)
-                NEXUS_PASSWORD=$(vault kv get -field=password nexus/credentials)
-                NEXUS_REPO_URL=$(vault kv get -field=repo_url nexus/credentials)
-
-                echo "Uploading Node.js app to Nexus..."
-                tar -czf src/app.tar.gz src/
-                curl -u $NEXUS_USERNAME:$NEXUS_PASSWORD --upload-file src/app.tar.gz $NEXUS_REPO_URL/repository/nodejs-app/
-                '''  
-
-            }
+                mkdir -p tmp
+                tar -czf tmp/app.tar.gz src/
+                '''
+                
+                // Upload the archive to Nexus
+                sh """
+                curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} \
+                    --upload-file tmp/app.tar.gz \
+                    ${NEXUS_REPO_URL}/repository/nodejs-app/
+                """
+            }   
         }
+    }
+
 
         stage('Terraform Apply') {
             steps {
