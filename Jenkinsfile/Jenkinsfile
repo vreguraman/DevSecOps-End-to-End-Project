@@ -106,7 +106,6 @@ pipeline {
                     docker build -t $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest . || { echo "Docker build failed"; exit 1; }
                     '''
                 }
-                archiveArtifacts artifacts: 'trivy-results.json', allowEmptyArchive: true
             }
         }
 
