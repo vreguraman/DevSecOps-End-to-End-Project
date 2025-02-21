@@ -61,13 +61,17 @@
 
 [Jenkins Slack Notification Configuration](#Jenkins-Slack-Notification-Configuration)
 
-[Configuring Grafana Alerts for Security & Performance Monitoring](#Configuring-Grafana-Alerts-for-Security-&-Performance-Monitoring)
+[Configuring Grafana Alerts for Security and Performance Monitoring](#Configuring-Grafana-Alerts-for-Security-and-Performance-Monitoring)
 
 [Automating with Jenkins Pipeline](#Automating-with-Jenkins-Pipeline)
 
-[CI/CD Pipeline: Automated DevSecOps Deployment](#CI/CD-Pipeline:-Automated-DevSecOps-Deployment)
+[CI-CD Pipeline: Automated DevSecOps Deployment](#CI-CD-Pipeline:-Automated-DevSecOps-Deployment)
 
-[Who Can Use This Project](#Who-Can-Use-This-Project)
+[Who Can Use This Project?](#Who-Can-Use-This-Project?)
+
+[Challenges and Learnings](#Challenges-and-Learnings)
+
+[Future Enhancements](#Future-Enhancements)
 
 
 
@@ -2224,7 +2228,7 @@ http://<your-server-ip>:3001
 
 ---
 
-## ⚠️ Configuring **Grafana Alerts** for Security & Performance Monitoring  
+## ⚠️ Configuring Grafana Alerts for Security and Performance Monitoring  
 
 ### 📌 Step 1: Open Grafana & Navigate to Alerting
 - Go to **Grafana Dashboard** (`http://your-grafana-ip:3001`).
@@ -2350,7 +2354,7 @@ Once everything is set up, follow these steps to execute the Jenkins pipeline:
 ✅ **Jenkins will now trigger the pipeline execution and automate the deployment process!** 🚀  
 
 ---
-##  **CI/CD Pipeline: Automated DevSecOps Deployment** 
+##  **CI-CD Pipeline: Automated DevSecOps Deployment** 
 
 This Jenkins pipeline automates the **secure deployment** of a Node.js application by integrating **Vault for secrets management, SonarQube for code quality, Snyk for security scanning, and TFScan for Terraform security checks**. It provisions **AWS infrastructure using Terraform**, builds and scans Docker images with **Trivy**, stores artifacts in **Nexus**, and deploys via **Ansible**. Additionally, it ensures **continuous monitoring and automated notifications** via Slack. This **end-to-end DevSecOps pipeline** guarantees a **robust, secure, and efficient software delivery process**.
 
@@ -2361,7 +2365,7 @@ This Jenkins pipeline automates the **secure deployment** of a Node.js applicati
 
 ---
 
-## 👥 Who Can Use This Project?  
+## Who Can Use This Project?  
 
 ✅ **DevOps Engineers** - To implement security in CI/CD pipelines.  
 ✅ **Security Teams** - To monitor vulnerabilities & enforce compliance.  
