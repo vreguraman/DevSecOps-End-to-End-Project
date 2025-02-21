@@ -5,6 +5,7 @@ pipeline {
         VAULT_TOKEN = credentials('VAULT_TOKEN')
         PATH = "/opt/sonar-scanner/bin:$PATH"
         TERRAFORM_DIR = "terraform/"
+        SSH_KEY_PATH = "/var/lib/jenkins/workspace/test/ansible/ansible_ssh_key.pem"
     }
     stages {
         
@@ -138,12 +139,24 @@ pipeline {
         }
     }
 
+    stage('Set Permissions for SSH Key') {
+        steps {
+            script {
+                echo "Fixing SSH key permissions..."
+                sh "chmod 777 ${SSH_KEY_PATH}"
+            }
+        }
+    }
 
     stage('Terraform Apply') {
         steps {
             dir('terraform') {
                     withCredentials([sshUserPrivateKey(credentialsId: 'ANSIBLE_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
                     sh '''
+
+                    echo "Destroying existing EC2 instance before applying new changes..."
+                    sh 'terraform destroy -auto-approve || true'
+
                     echo "Applying Terraform changes..."
                     terraform apply -auto-approve tfplan
 
