@@ -1,81 +1,50 @@
 # 🚀 End-to-End DevSecOps Implementation: CI/CD, Security, and Monitoring
 
 ## Table of Content:
+- [Project Overview](#project-overview)
+- [Key Objectives](#key-objectives)
+- [Architecture](#architecture)
+- [Create Jenkins Server](#create-jenkins-server)
+- [Install OpenTelemetry and Project Dependencies](#install-opentelemetry-and-project-dependencies)
+- [Jenkins Installation](#jenkins-installation)
+  - [Configuring Jenkins for CI/CD with Additional Tools](#configuring-jenkins-for-cicd-with-additional-tools)
+  - [Troubleshooting Jenkins IP Address Updates](#troubleshooting-jenkins-ip-address-updates)
+- [Configure Tools](#configure-tools)
+  - [Install Terraform](#install-terraform)
+  - [Install Tfsec](#install-tfsec)
+  - [Install Trivy](#install-trivy)
+  - [Install Snyk CLI](#install-snyk-cli)
+  - [Install Ansible](#install-ansible)
+- [Configuring Global Tools in Jenkins](#configuring-global-tools-in-jenkins)
+- [Create Your First Job to Verify Jenkins](#create-your-first-job-to-verify-jenkins)
+- [Deploying SonarQube as a Container](#deploying-sonarqube-as-a-container)
+  - [Adding SonarQube Configuration to Jenkins](#adding-sonarqube-configuration-to-jenkins)
+  - [Create a New Project in SonarQube](#create-a-new-project-in-sonarqube)
+  - [Analyze Code with Sonar Scanner](#analyze-code-with-sonar-scanner)
+- [Installing HashiCorp Vault for Secure Secrets Management](#installing-hashicorp-vault-for-secure-secrets-management)
+  - [Integrate Vault for Secrets Management](#integrate-vault-for-secrets-management)
+  - [Secure Credentials in Jenkins Using HashiCorp Vault](#secure-credentials-in-jenkins-using-hashicorp-vault)
+  - [Testing HashiCorp Vault in a Freestyle Jenkins Job](#testing-hashicorp-vault-in-a-freestyle-jenkins-job)
+- [Integrating Tfsec to Enhance Terraform Security Scanning](#integrating-tfsec-to-enhance-terraform-security-scanning)
+- [Integrating Trivy to Enhance Container Image Scanning](#integrating-trivy-to-enhance-container-image-scanning)
+- [Push Docker Image to a Container Registry](#push-docker-image-to-a-container-registry)
+- [Deploying Nexus Repository as a Docker Container](#deploying-nexus-repository-as-a-docker-container)
+- [Securely Managing Credentials with HashiCorp Vault](#securely-managing-credentials-with-hashicorp-vault)
+  - [Storing Nexus Credentials](#storing-nexus-credentials)
+  - [Storing Docker Credentials](#storing-docker-credentials)
+  - [Storing Snyk Token](#storing-snyk-token)
+- [Monitoring with Prometheus and Grafana](#monitoring-with-prometheus-and-grafana)
+- [From Scans to Dashboards: Unlocking Security Insights with Trivy, Tfsec, Prometheus, and Grafana](#from-scans-to-dashboards-unlocking-security-insights-with-trivy-tfsec-prometheus-and-grafana)
+- [OpenTelemetry Setup and Configuration](#opentelemetry-setup-and-configuration)
+- [Jenkins Slack Notification Configuration](#jenkins-slack-notification-configuration)
+- [Configuring Grafana Alerts for Security and Performance Monitoring](#configuring-grafana-alerts-for-security-and-performance-monitoring)
+- [Automating with Jenkins Pipeline](#automating-with-jenkins-pipeline)
+- [CI/CD Pipeline: Automated DevSecOps Deployment](#cicd-pipeline-automated-devsecops-deployment)
+- [Who Can Use This Project?](#who-can-use-this-project)
+- [Challenges and Learnings](#challenges-and-learnings)
+- [Future Enhancements](#future-enhancements)
 
-[Project Overview](#Project-Overview)
-
-[Key Objectives](#Key-Objectives)
-
-[Architecture](#Architecture)
-
-[Create Jenkins Server](#Create-Jenkins-Server)
-
-[Install OpenTelemetry and Project Dependencies](#Install-OpenTelemetry-and-Project-Dependencies)
-
-[Jenkins Installation](#Jenkins-Installation)
-
-- [Configuring Jenkins for CI-CD with Additional Tools](#Configuring-Jenkins-for-CI-CD-with-Additional-Tools)
-
-- [Troubleshooting Updating Jenkins IP Address](#Troubleshooting-Updating-Jenkins-IP-Address)
-
-[Configure Tools](#Configure-Tools)
-
-- [Install Terraform](#Install-Terraform)
-- [Install TFScan](#Install-TFScan)
-- [Install Trivy](#Install-Trivy)
-- [Install Snyk CLI](#Install-Snyk-CLI)
-- [Install Ansible](#Install-Ansible)
-  
-[Configuring Global Tools in Jenkins](#Configuring-Global-Tools-in-Jenkins)
-
-[Create Your First Job to Verify Jenkins](#Create-Your-First-Job-to-Verify-Jenkins)
-
-[Deploying SonarQube as a Container](#Deploying-SonarQube-as-a-Container)
-- [Adding SonarQube Configuration to Jenkins](#Adding-SonarQube-Configuration-to-Jenkins)
-- [Create a New Project in SonarQube](#Create-a-New-Project-in-SonarQube)
-- [Analyze Code with Sonar Scanner](#Analyze-Code-with-Sonar-Scanner)
-  
-[Installing HashiCorp Vault for Secure Secrets Management](#Installing-HashiCorp-Vault-for-Secure-Secrets-Management)
-- [Integrate Vault for Secrets Management](#Integrate-Vault-for-Secrets-Management)
-- [Secure Credentials in Jenkins Using HashiCorp Vault](#Secure-Credentials-in-Jenkins-Using-HashiCorp-Vault)
-- [Testing HashiCorp Vault in a Freestyle Jenkins Job](#Testing-HashiCorp-Vault-in-a-Freestyle-Jenkins-Job)
-
-[Integrating Tfsec to Enhance Terraform Security Scanning](#Integrating-Tfsec-to-Enhance-Terraform-Security-Scanning)
-
-[Integrating Trivy to Enhance Container Image Scanning](#Integrating-Trivy-to-Enhance-Container-Image-Scanning)
-
-[Push Docker Image to a Container Registry](#Push-Docker-Image-to-a-Container-Registry)
-
-[Deploying Nexus Repository as a Docker Container](#Deploying-Nexus-Repository-as-a-Docker-Container)
-
-[Securely Managing Credentials with HashiCorp Vault](#Securely-Managing-Credentials-with-HashiCorp-Vault)
-- [Storing Nexus Credentials](#Storing-Nexus-Credentials)
-- [Storing Docker Credentials](#Storing-Docker-Credentials)
-- [Storing Snyk Token](#Storing-Snyk-Token)
-  
-[Monitoring with Prometheus and Grafana](#Monitoring-with-Prometheus-and-Grafana)
-
-[From Scans to Dashboards: Unlocking Security Insights with Trivy, TFsec, Prometheus, and Grafana](#from-scans-to-dashboards-unlocking-security-insights-with-trivy-tfsec-prometheus-and-grafana)
-
-[OpenTelemetry Setup and Configuration](#OpenTelemetry-Setup-and-Configuration)
-
-[Jenkins Slack Notification Configuration](#Jenkins-Slack-Notification-Configuration)
-
-[Configuring Grafana Alerts for Security and Performance Monitoring](#Configuring-Grafana-Alerts-for-Security-and-Performance-Monitoring)
-
-[Automating with Jenkins Pipeline](#Automating-with-Jenkins-Pipeline)
-
-[CI-CD Pipeline: Automated DevSecOps Deployment](#CI-CD-Pipeline:-Automated-DevSecOps-Deployment)
-
-[Who Can Use This Project?](#Who-Can-Use-This-Project?)
-
-[Challenges and Learnings](#Challenges-and-Learnings)
-
-[Future Enhancements](#Future-Enhancements)
-
-
-
-
+---
 
 ### Project Overview 
 This DevSecOps project implements a fully automated CI/CD pipeline that integrates security scanning, observability, and infrastructure automation. The project ensures secure application deployment by incorporating static code analysis, container security scanning, infrastructure as code (IaC) validation, and real-time monitoring using industry-leading tools like OpenTelemetry, Prometheus, Grafana, Trivy, and TFSec.
@@ -117,7 +86,7 @@ Enhance developer communication and incident response by integrating Slack notif
 To ensure a cost-effective solution without compromising on functionality, all tools used in this DevSecOps project have been integrated into the Jenkins server. This approach avoids the need for additional servers or infrastructure, reducing operational costs.
 
 #### Rationale
-- **Centralized Integration**: Running all tools (e.g. Prometheus, Grafana, Trivy, TFsec, SonarQube, OWASP ZAP) on the same server minimizes resource utilization and eliminates the cost of multiple servers.
+- **Centralized Integration**: Running all tools (e.g. Prometheus, Grafana, Trivy, TFsec, SonarQube) on the same server minimizes resource utilization and eliminates the cost of multiple servers.
 - **Simplified Management**: Centralized integration simplifies maintenance, monitoring, and updates for all tools.
 - **Efficient Resource Usage**: Using the Jenkins server for multi-purpose tasks optimizes the allocated resources, leveraging idle capacity during pipeline executions.
 
