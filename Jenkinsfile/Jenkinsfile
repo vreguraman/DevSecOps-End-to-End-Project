@@ -5,7 +5,7 @@ pipeline {
         VAULT_TOKEN = credentials('VAULT_TOKEN')
         PATH = "/opt/sonar-scanner/bin:$PATH"
         TERRAFORM_DIR = "terraform/"
-        SSH_KEY_PATH = "/var/lib/jenkins/workspace/test/ansible/ansible_ssh_key.pem"
+        
     }
     stages {
         
@@ -136,15 +136,6 @@ pipeline {
                     ${NEXUS_REPO_URL}/repository/nodejs-app/
                 """
             }   
-        }
-    }
-
-    stage('Set Permissions for SSH Key') {
-        steps {
-            script {
-                echo "Fixing SSH key permissions..."
-                sh "chmod 777 ${SSH_KEY_PATH}"
-            }
         }
     }
 

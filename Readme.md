@@ -2244,7 +2244,49 @@ trivy_vulnerabilities{severity="CRITICAL"} > 0
 - Check if Slack, Teams, or Email notifications are received.
 - Adjust alert thresholds to minimize false positives.
 
+---
+### Automating with Jenkins Pipeline
 
+### Creating Jenkins Pipeline
+
+1. In the Jenkins dashboard, click on **+ New Item** or **New Job**.
+2. Provide a name (e.g., Devsecops Pipeline).
+3. Select **Pipeline** and click **OK** to proceed.
+4. In the left-side menu, click **Configure**.
+5. In the **Pipeline** section:
+   - in **Definition** select  **Pipeline script from SCM**.
+   - Under **SCM**, select **Git**.
+   - Provide the repository URL: `https://github.com/DevopsProjects05/DevSecOps-End-to-End-Project.git`.
+   - In **Branches to build**, enter: `*/main`.
+   - For **Script Path**, enter: `Jenkinsfile/Jenkinsfile`.
+6. Click **Apply** and **Save**.
+
+
+```
+# ⚠️🚀 **IMPORTANT NOTE: BEFORE RUNNING THE PIPELINE** 🚀⚠️
+
+**Before executing the Jenkins pipeline, ensure the following critical conditions are met to prevent failures:
+
+## ❌ Delete Any Existing EC2 Instance
+- Before running the pipeline, delete any existing EC2 instance to avoid conflicts and unexpected errors.
+
+## 🔐 Ensure Proper Permissions for Ansible SSH Key
+- The SSH key used by Ansible must have correct permissions to enable a secure connection.
+
+### ✅ Run the Following Command: # Replace with your workspace name
+
+chmod 777 /var/lib/jenkins/workspace/your-workspace-name/ansible/ansible_ssh_key.pem
+
+```
+---
+## 🚀 **CI/CD Pipeline: Automated DevSecOps Deployment** 🚀
+
+This Jenkins pipeline automates the **secure deployment** of a Node.js application by integrating **Vault for secrets management, SonarQube for code quality, Snyk for security scanning, and TFScan for Terraform security checks**. It provisions **AWS infrastructure using Terraform**, builds and scans Docker images with **Trivy**, stores artifacts in **Nexus**, and deploys via **Ansible**. Additionally, it ensures **continuous monitoring and automated notifications** via Slack. This **end-to-end DevSecOps pipeline** guarantees a **robust, secure, and efficient software delivery process**.
+
+### You will see the stage view of your pipeline:
+
+
+---
 
 
 
