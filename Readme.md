@@ -55,7 +55,7 @@
   
 [Monitoring with Prometheus and Grafana](#Monitoring-with-Prometheus-and-Grafana)
 
-[Bringing Visibility to Trivy & TFsec: Security Insights with Prometheus & Grafana](#Bringing-Visibility-to-Trivy-&-TFsec:-Security-Insights-with-Prometheus-&-Grafana)
+[From Scans to Dashboards: Unlocking Security Insights with Trivy, TFsec, Prometheus, and Grafana](From-Scans-to-Dashboards:-Unlocking-Security-Insights-with-Trivy,-TFsec,-Prometheus,-and-Grafana)
 
 [OpenTelemetry Setup and Configuration](#OpenTelemetry-Setup-and-Configuration)
 
@@ -1594,7 +1594,7 @@ click on **import.**
 
 ---
 
-## Bringing Visibility to Trivy & TFsec: Security Insights with Prometheus & Grafana
+## From Scans to Dashboards: Unlocking Security Insights with Trivy, TFsec, Prometheus, and Grafana
 
 Trivy and TFsec are powerful security scanning tools for containers and Infrastructure as Code (IaC), but they lack a built-in graphical interface for visualizing vulnerabilities. This project bridges that gap by integrating Trivy and TFsec with Prometheus and Grafana, transforming raw security scan data into insightful, real-time dashboards for better monitoring and decision-making. 🚀
 
