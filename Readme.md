@@ -23,7 +23,36 @@
 - [Install Terraform](#Install-Terraform)
 - [Install TFScan](#Install-TFScan)
 - [Install Trivy](#Install-Trivy)
+- [Install Snyk CLI](#Install-Snyk-CLI)
+- [Install Ansible](#Install-Ansible)
+  
+[Configuring Global Tools in Jenkins](#Configuring-Global-Tools-in-Jenkins)
+
+[Create Your First Job to Verify Jenkins](#Create-Your-First-Job-to-Verify-Jenkins)
+
+[Deploying SonarQube as a Container](#Deploying-SonarQube-as-a-Container)
+- [Adding SonarQube Configuration to Jenkins](#Adding-SonarQube-Configuration-to-Jenkins)
+- [Create a New Project in SonarQube](#Create-a-New-Project-in-SonarQube)
+- [Analyze Code with Sonar Scanner](#Analyze-Code-with-Sonar-Scanner)
+  
+[Installing HashiCorp Vault for Secure Secrets Management](#Installing-HashiCorp-Vault-for-Secure-Secrets-Management)
+- [Integrate Vault for Secrets Management](#Integrate-Vault-for-Secrets-Management)
+- [Secure Credentials in Jenkins Using HashiCorp Vault](#Secure-Credentials-in-Jenkins-Using-HashiCorp-Vault)
+- [Testing HashiCorp Vault in a Freestyle Jenkins Job](#Testing-HashiCorp-Vault-in-a-Freestyle-Jenkins-Job)
+
+[Integrating Tfsec to Enhance Terraform Security Scanning](#Integrating-Tfsec-to-Enhance-Terraform-Security-Scanning)
+
+[Integrating Trivy to Enhance Container Image Scanning](#Integrating-Trivy-to-Enhance-Container-Image-Scanning)
+
+[Push Docker Image to a Container Registry](#Push-Docker-Image-to-a-Container-Registry)
+
+[Deploying Nexus Repository as a Docker Container](#Deploying-Nexus-Repository-as-a-Docker-Container)
+
+[Securely Managing Credentials with HashiCorp Vault](#Securely-Managing-Credentials-with-HashiCorp-Vault)
+- [Storing and Accessing Credentials in Vault](#Storing-and-Accessing-Credentials-in-Vault)
+- [Storing Snyk Token](#Storing-Snyk-Token)
 - 
+
 
 
 
@@ -60,7 +89,7 @@ Enhance developer communication and incident response by integrating Slack notif
 
 ## Architecture
 ---
-![](/Images/Devsecops.png)
+![Architecture](/Images/Devsecops1.png)
 
 ---
 
@@ -76,7 +105,7 @@ To ensure a cost-effective solution without compromising on functionality, all t
 #### Implementation
 - All tools are installed and configured on the Jenkins server instance.
 - Prometheus and Grafana are set up to run on separate ports to avoid conflicts.
-- Tools like Trivy, TFsec, and OWASP ZAP are containerized or run as CLI tools, leveraging Docker where applicable.
+- Tools like Trivy, TFsec, are containerized or run as CLI tools, leveraging Docker where applicable.
 
 
 ---
@@ -97,6 +126,7 @@ Running the server in the background avoids the need to open duplicate terminals
 3. Configure the instance:
    - **AMI**: Amazon Linux 2.
    - **Instance Type**: `t3.xlarge`.
+   - **Create a key pair** (Store it in Secure place)
    - **Storage**: 50 GiB gp2.
    - **Security Group**: Allow SSH (port 22) and HTTP (port 8080).
    - Assign a key pair.
@@ -740,9 +770,8 @@ Before proceeding, make sure to securely store the following values, as they wil
 
 ---
 
-
  Ensure `SonarQube Scanner` plugin is installed.
-#### Analyze Code with Sonar Scanner
+### Analyze Code with Sonar Scanner
 1. Navigate to the `src` directory.
    ```bash
    cd src
@@ -1169,13 +1198,13 @@ docker run -d -p 8081:8081 --name nexus sonatype/nexus3
 
 ### Storing and Accessing Credentials in Vault
 
+### Storing Nexus Credentials
+
 #### 1. Enable the KV Secrets Engine
 Ensure the KV secrets engine is enabled in Vault to securely store credentials.
 ```bash
 vault secrets enable -path=nexus kv
 ```
-
-
 #### 2. Store Nexus Credentials
 Use the `vault kv put` command to securely store your Nexus credentials and repository URL or token:
 ```bash
@@ -1207,7 +1236,7 @@ To fetch the stored credentials:
 
 ---
 
-#### Store Docker Credentials:
+#### Storing Docker Credentials:
 ```bash
 vault kv put secret/docker username="<user-name>" password="<your-password>"
 ```
@@ -2261,6 +2290,24 @@ trivy_vulnerabilities{severity="CRITICAL"} > 0
    - For **Script Path**, enter: `Jenkinsfile/Jenkinsfile`.
 6. Click **Apply** and **Save**.
 
+###  Store the Private Key in Jenkins Credentials
+
+Once the **EC2 instance** is launched, store the **private key** in **Jenkins Global Credentials** for secure SSH access.  
+
+1. **Open the `.pem` file** (e.g., `ci-cd-key.pem`) using **Notepad** or any text editor.  
+2. **Copy the entire private key**, including:  `-----BEGIN RSA PRIVATE KEY----- (Private Key Content) -----END RSA PRIVATE KEY-----`
+3. **Go to Jenkins Dashboard** → **Manage Jenkins** → **Manage Credentials**.  
+4. Under **Global credentials**, click **Add Credentials**.  
+5. **Set the following values**:  
+- **Kind**: Select **SSH Username with Private Key**.  
+- **ID**: Enter **"ANSIBLE_SSH_KEY"**.  
+- **Username**: Enter **"ec2-user"**.  
+- **Private Key**: Select **"Enter directly"**, then **paste** the copied private key.  
+6. Click **Add**, then **Apply & Save**.  
+
+✅ **Your private key is now securely stored in Jenkins, ready for automated deployments!** 🚀  
+
+
 
 ```
 # ⚠️🚀 **IMPORTANT NOTE: BEFORE RUNNING THE PIPELINE** 🚀⚠️
@@ -2278,6 +2325,17 @@ trivy_vulnerabilities{severity="CRITICAL"} > 0
 chmod 777 /var/lib/jenkins/workspace/your-workspace-name/ansible/ansible_ssh_key.pem
 
 ```
+
+###  Build the Jenkins Pipeline  
+
+Once everything is set up, follow these steps to execute the Jenkins pipeline:  
+
+1. **Go to the Jenkins Dashboard**.  
+2. Click on the **pipeline** that you have created.  
+3. Click **"Build Now"** to start executing the pipeline.  
+
+✅ **Jenkins will now trigger the pipeline execution and automate the deployment process!** 🚀  
+
 ---
 ## 🚀 **CI/CD Pipeline: Automated DevSecOps Deployment** 🚀
 
@@ -2285,11 +2343,10 @@ This Jenkins pipeline automates the **secure deployment** of a Node.js applicati
 
 ### You will see the stage view of your pipeline:
 
+---
+![](/Images/Devsecopspipeline.jpg)
 
 ---
-
-
-
 
 ## 👥 Who Can Use This Project?  
 

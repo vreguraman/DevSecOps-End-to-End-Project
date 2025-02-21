@@ -106,9 +106,17 @@ pipeline {
 
                     echo "Scanning Docker image with Trivy..."
                     trivy image --severity HIGH,CRITICAL $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest > trivy-results.json
+
+                    echo "Logging in to Docker Hub..."
+                    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+
+                    echo "Pushing Docker image to Docker Hub..."
+                    docker push $DOCKER_USERNAME/sample-ecommerce-nodejs-app:latest
                     '''
                     echo "Archiving Trivy scan results..."
                     archiveArtifacts artifacts: 'trivy-results.json', allowEmptyArchive: true
+
+                    
                 }
             }
         }
