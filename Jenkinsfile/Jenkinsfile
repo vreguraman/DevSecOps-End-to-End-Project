@@ -154,18 +154,6 @@ pipeline {
                     withCredentials([sshUserPrivateKey(credentialsId: 'ANSIBLE_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
                     sh '''
 
-                    echo "Ensuring Terraform is available..."
-                    export PATH=$PATH:/usr/local/bin:/usr/bin
-
-                    echo "Initializing Terraform..."
-                    terraform init
-
-                    echo "Refreshing Terraform state..."
-                    terraform refresh
-
-                    echo "Destroying existing EC2 instance before applying new changes..."
-                    terraform destroy -auto-approve || true
-
                     echo "Applying Terraform changes..."
                     terraform apply -auto-approve tfplan
 
