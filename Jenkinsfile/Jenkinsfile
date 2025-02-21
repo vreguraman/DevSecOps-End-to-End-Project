@@ -155,7 +155,13 @@ pipeline {
                     sh '''
 
                     echo "Ensuring Terraform is available..."
-                    export PATH=$PATH:$workspace/terraform
+                    export PATH=$PATH:/usr/local/bin:/usr/bin
+
+                    echo "Initializing Terraform..."
+                    terraform init
+
+                    echo "Refreshing Terraform state..."
+                    terraform refresh
 
                     echo "Destroying existing EC2 instance before applying new changes..."
                     terraform destroy -auto-approve || true
