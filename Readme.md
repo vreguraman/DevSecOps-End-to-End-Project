@@ -55,7 +55,7 @@
   
 [Monitoring with Prometheus and Grafana](#Monitoring-with-Prometheus-and-Grafana)
 
-[From Scans to Dashboards: Unlocking Security Insights with Trivy, TFsec, Prometheus, and Grafana](From-Scans-to-Dashboards:-Unlocking-Security-Insights-with-Trivy,-TFsec,-Prometheus,-and-Grafana)
+[From Scans to Dashboards: Unlocking Security Insights with Trivy, TFsec, Prometheus, and Grafana](#from-scans-to-dashboards-unlocking-security-insights-with-trivy-tfsec-prometheus-and-grafana)
 
 [OpenTelemetry Setup and Configuration](#OpenTelemetry-Setup-and-Configuration)
 
