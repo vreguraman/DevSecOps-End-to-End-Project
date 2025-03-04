@@ -44,3 +44,20 @@ cd /downloads/sonarqube
 wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
 unzip sonar-scanner-cli-5.0.1.3006-linux.zip
 sudo mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner
+
+nexus 
+=====
+docker run -d -p 8081:8081 --name nexus sonatype/nexus3
+docker exec -it nexus cat /nexus-data/admin.password
+
+
+prometheus & grafana
+==================
+
+npm install prom-client
+wget https://dl.grafana.com/oss/release/grafana-10.0.0.linux-amd64.tar.gz
+tar -xvzf grafana-10.0.0.linux-amd64.tar.gz
+cd grafana-10.0.0/bin
+./grafana-server
+
+
